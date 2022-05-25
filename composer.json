@@ -1,0 +1,24 @@
+{
+    "name": "knevelina/php-modernity-signature",
+    "description": "Modernity signature for PHP code bases",
+    "type": "project",
+    "require": {
+        "nikic/php-parser": "^4.13"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Wouter van den Brink",
+            "email": "git@woutervdb.com"
+        }
+    ],
+    "autoload": {
+        "Knevelina\\Modernity\\": "src/"
+    },
+    "autoload-dev": {
+        "Knevelina\\Modernity\\Tests\\": "tests/"
+    }
+}
