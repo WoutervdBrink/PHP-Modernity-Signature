@@ -17,9 +17,13 @@
         }
     ],
     "autoload": {
-        "Knevelina\\Modernity\\": "src/"
+        "psr-4": {
+            "Knevelina\\Modernity\\": "src/"
+        }
     },
     "autoload-dev": {
-        "Knevelina\\Modernity\\Tests\\": "tests/"
+        "psr-4": {
+            "Knevelina\\Modernity\\Tests\\": "tests/"
+        }
     }
 }
