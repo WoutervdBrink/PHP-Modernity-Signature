@@ -3,6 +3,7 @@
     "description": "Modernity signature for PHP code bases",
     "type": "project",
     "require": {
+        "php": "^8.1",
         "nikic/php-parser": "^4.13"
     },
     "require-dev": {
