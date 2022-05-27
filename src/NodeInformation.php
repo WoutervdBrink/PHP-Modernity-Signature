@@ -7,25 +7,13 @@ use PhpParser\Node;
 /**
  * Information about an AST node.
  */
-class NodeInformation
+final class NodeInformation
 {
     public function __construct(
-        /**
-         * The class name of the AST node.
-         */
         private readonly string $class,
-
-        /**
-         * @var LanguageLevel The language level in which the node was first introduced.
-         */
-        private readonly LanguageLevel $from,
-
-        /**
-         * @var LanguageLevel|null The language level in which the node was removed and/or deprecated, if any.
-         */
-        private readonly ?LanguageLevel $to = null,
-    )
-    {
+        private readonly LanguageLevelInspector $from,
+        private readonly LanguageLevelInspector $to
+    ) {
     }
 
     /**
@@ -46,7 +34,7 @@ class NodeInformation
      */
     public function getFrom(Node $node): LanguageLevel
     {
-        return $this->from;
+        return $this->from->inspect($node);
     }
 
     /**
@@ -57,7 +45,7 @@ class NodeInformation
      */
     public function getTo(Node $node): ?LanguageLevel
     {
-        return $this->to;
+        return $this->to->inspect($node);
     }
 
     public function isDeprecated(): bool

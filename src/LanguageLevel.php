@@ -2,7 +2,9 @@
 
 namespace Knevelina\Modernity;
 
-enum LanguageLevel: string
+use PhpParser\Node;
+
+enum LanguageLevel: string implements LanguageLevelInspector
 {
     case PHP5_2 = '5.2';
     case PHP5_3 = '5.3';
@@ -33,5 +35,10 @@ enum LanguageLevel: string
     public function isNewerThan(LanguageLevel $other): bool
     {
         return \version_compare($this->value, $other->value, '>');
+    }
+
+    public function inspect(Node $node): ?LanguageLevel
+    {
+        return $this;
     }
 }
