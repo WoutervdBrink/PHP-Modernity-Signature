@@ -60,9 +60,6 @@ use PhpParser\Node\{Expr,
     Stmt\ClassConst
 };
 
-use function array_key_exists;
-use function str_contains;
-
 final class NodeInformationRepository
 {
     /**
@@ -88,7 +85,7 @@ final class NodeInformationRepository
         LanguageLevelInspector $from = LanguageLevel::PHP5_2,
         ?LanguageLevelInspector $to = null
     ): void {
-        if (array_key_exists($class, $this->nodeMap)) {
+        if (\array_key_exists($class, $this->nodeMap)) {
             throw new InvalidArgumentException(
                 sprintf('Version information on node "%s" has already been registered!', $class)
             );
@@ -248,7 +245,7 @@ final class NodeInformationRepository
                 // literals.
                 // https://www.php.net/manual/en/language.types.integer.php
                 // Also applies to floats: https://www.php.net/manual/en/language.types.float.php
-                if (str_contains($rawValue, '_')) {
+                if (\str_contains($rawValue, '_')) {
                     return LanguageLevel::PHP7_4;
                 }
 
