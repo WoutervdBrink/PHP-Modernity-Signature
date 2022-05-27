@@ -5,6 +5,8 @@ namespace Knevelina\Modernity;
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt\Class_;
 
+use function in_array;
+
 /**
  * Support class to help with resolving certain versioning quirks.
  */
@@ -24,7 +26,7 @@ final class Quirks
 
     public static function isSuperGlobal(string $name): bool
     {
-        return \in_array($name, self::SUPERGLOBALS);
+        return in_array($name, self::SUPERGLOBALS);
     }
 
     public static function flagsHaveVisibilityModifier(int $flag): bool

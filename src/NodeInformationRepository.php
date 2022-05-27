@@ -11,7 +11,7 @@ use function str_contains;
 final class NodeInformationRepository
 {
     /**
-     * @var array Mapping from class names to node informations.
+     * @var array Mapping from class name to node information.
      */
     private array $nodeMap;
 
@@ -25,7 +25,9 @@ final class NodeInformationRepository
     /**
      * Register information about a node.
      *
-     * @param NodeInformation $information Information to register.
+     * @param string $class The class to register information about
+     * @param LanguageLevelInspector $from The language level in which the node was introduced.
+     * @param LanguageLevelInspector|null $to The language level in which the node was removed and/or deprecated.
      * @return void
      */
     protected function register(
@@ -69,7 +71,7 @@ final class NodeInformationRepository
         $this->register(
                 Node\Expr\ClosureUse::class,
             to: new class implements LanguageLevelInspector {
-                    public function inspect(Node $node): ?LanguageLevel
+                    public function inspect(/** @var Node\Expr\ClosureUse $node */ Node $node): ?LanguageLevel
                     {
                         // "As of PHP 7.1, these variables must not include superglobals, $this, or variables with the same name
                         // as a parameter."
@@ -102,7 +104,7 @@ final class NodeInformationRepository
         $this->register(
                   Node\Expr\Instanceof_::class,
             from: new class implements LanguageLevelInspector {
-                      public function inspect(Node $node): ?LanguageLevel
+                      public function inspect(/** @var Node\Expr\Instanceof_ $node */ Node $node): ?LanguageLevel
                       {
                           // As of PHP 8.0.0, instanceof can now be used with arbitrary expressions.
                           // https://www.php.net/instanceof
@@ -127,7 +129,7 @@ final class NodeInformationRepository
         $this->register(
                   Node\Expr\New_::class,
             from: new class implements LanguageLevelInspector {
-                      public function inspect(Node $node): ?LanguageLevel
+                      public function inspect(/** @var Node\Expr\New_ $node */ Node $node): ?LanguageLevel
                       {
                           // As of PHP 8.0.0, using new with arbitrary expressions is supported.
                           // https://www.php.net/manual/en/language.oop5.basic.php#language.oop5.basic.new
@@ -208,7 +210,7 @@ final class NodeInformationRepository
         $this->register(Node\Scalar\MagicConst\Dir::class, LanguageLevel::PHP5_3);
         $this->register(Node\Scalar\MagicConst\Namespace_::class, LanguageLevel::PHP5_3);
 
-        // __TRAIT__ was assed in 5.4.0
+        // __TRAIT__ was added in 5.4.0
         $this->register(Node\Scalar\MagicConst\Trait_::class, LanguageLevel::PHP5_4);
 
         // All other constants have been around forever - this is caught by defining Scalar as an always-superclass
@@ -223,7 +225,7 @@ final class NodeInformationRepository
         $this->register(
                   Node\Stmt\ClassConst::class,
             from: new class implements LanguageLevelInspector {
-                      public function inspect(Node $node): ?LanguageLevel
+                      public function inspect(/** @var Node\Stmt\ClassConst $node */ Node $node): ?LanguageLevel
                       {
                           // As of PHP 7.1.0 visibility modifiers are allowed for class constants.
                           // https://www.php.net/manual/en/language.oop5.constants.php

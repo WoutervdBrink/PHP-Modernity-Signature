@@ -14,7 +14,7 @@ class LanguageLevelTest extends TestCase
         $this->assertEquals($major, $level->getMajor());
     }
 
-    public function versions()
+    public function versions(): array
     {
         return [
             [LanguageLevel::PHP5_2, 5],
@@ -48,7 +48,7 @@ class LanguageLevelTest extends TestCase
         $this->assertFalse($older->isNewerThan($older));
     }
 
-    public function olderVersions()
+    public function olderVersions(): array
     {
         return [
             [LanguageLevel::PHP5_2, LanguageLevel::PHP5_3],
