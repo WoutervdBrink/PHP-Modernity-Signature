@@ -59,13 +59,39 @@ final class NodeInformationRepository
         $this->register(Node\Expr\ArrayItem::class);
         $this->register(Node\Expr\Array_::class);
         $this->register(Node\Expr\ArrowFunction::class, LanguageLevel::PHP7_4);
-        $this->register(Node\Expr\Assign::class);
+        $this->register(
+            Node\Expr\Assign::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Expr\Assign $node */ Node $node): ?LanguageLevel
+                {
+                    // https://wiki.php.net/rfc/short_list_syntax
+                    if ($node->var instanceof Node\Expr\Array_::class) {
+                        return LanguageLevel::PHP7_1;
+                    }
+
+                    return null;
+                }
+            }
+        );
         $this->register(Node\Expr\AssignOp::class);
         $this->register(Node\Expr\AssignRef::class);
         $this->register(Node\Expr\BinaryOp::class);
         $this->register(Node\Expr\BitwiseNot::class);
         $this->register(Node\Expr\BooleanNot::class);
-        $this->register(Node\Expr\ClassConstFetch::class);
+        $this->register(
+            Node\Expr\ClassConstFetch::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Expr\ClassConstFetch $node */ Node $node): ?LanguageLevel
+                {
+                    // https://www.php.net/manual/en/language.oop5.changelog.php
+                    if ((string) $node->name->name === 'class') {
+                        return LanguageLevel::PHP5_5;
+                    }
+
+                    return null;
+                }
+            }
+        );
         $this->register(Node\Expr\Clone_::class);
         $this->register(Node\Expr\Closure::class, LanguageLevel::PHP5_3);
         $this->register(
@@ -137,6 +163,11 @@ final class NodeInformationRepository
                               return LanguageLevel::PHP8_0;
                           }
 
+                          // https://www.php.net/manual/en/language.oop5.anonymous.php
+                          if ($node->class instanceof Node\Stmt\Class_::class) {
+                              return LanguageLevel::PHP7_0;
+                          }
+
                           return null;
                       }
                   }
@@ -163,6 +194,9 @@ final class NodeInformationRepository
         $this->register(Node\Expr\Variable::class);
         $this->register(Node\Expr\YieldFrom::class, LanguageLevel::PHP5_5);
         $this->register(Node\Expr\Yield_::class, LanguageLevel::PHP5_5);
+
+        // https://www.php.net/manual/en/language.types.null.php#language.types.null.casting
+        $this->register(Node\Expr\Cast::class, to: LanguageLevel::PHP7_1);
 
         // TODO: Intelligently determine superclass during runtime using instanceof
         // TODO: Add tests for this!
@@ -221,12 +255,31 @@ final class NodeInformationRepository
     {
         $this->register(Node\Stmt\Break_::class);
         $this->register(Node\Stmt\Case_::class);
-        $this->register(Node\Stmt\Catch_::class);
+        $this->register(
+            Node\Stmt\Catch_::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\Catch_ $node */ Node $node): ?LanguageLevel
+                {
+                    // The variable was required prior to PHP 8.0.0.
+                    // https://www.php.net/manual/en/language.exceptions.php#language.exceptions.catch
+                    if (empty($node->var)) {
+                        return LanguageLevel::PHP8_0;
+                    }
+
+                    return null;
+                }
+            }
+        );
         $this->register(
                   Node\Stmt\ClassConst::class,
             from: new class implements LanguageLevelInspector {
                       public function inspect(/** @var Node\Stmt\ClassConst $node */ Node $node): ?LanguageLevel
                       {
+                          // As of PHP 8.1.0, class constants can have the final modifier.
+                          if ($node->flags & Node\Stmt\Class_::MODIFIER_FINAL) {
+                              return LanguageLevel::PHP8_1;
+                          }
+
                           // As of PHP 7.1.0 visibility modifiers are allowed for class constants.
                           // https://www.php.net/manual/en/language.oop5.constants.php
                           if (Quirks::flagsHaveVisibilityModifier($node->flags)) {
@@ -237,11 +290,182 @@ final class NodeInformationRepository
                       }
                   }
         );
-        // TODO: Finish :-)
+        $this->register(
+            Node\Stmt\ClassMethod::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
+                {
+                    // https://www.php.net/manual/en/language.oop5.changelog.php
+                    return match((string) $node->name->name) {
+                        '__invoke', '__callStatic' => LanguageLevel::PHP5_3,
+                        '__debugInfo' => LanguageLevel::PHP5_6,
+                        '__serialize', '__unserialize' => LanguageLevel::PHP7_4,
+                        default => null
+                    };
+                }
+            },
+            to: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
+                {
+                    // https://www.php.net/manual/en/language.oop5.changelog.php
+                    return match((string) $node->name->name) {
+                        '__autoload' => LanguageLevel::PHP7_1,
+                        default => null
+                    };
+                }
+            }
+        );
+        $this->register(
+            Node\Stmt\Class_::class,
+            to: new class implements LanguageLevelInspector {
+            public function inspect(/** @var Node\Stmt\Class_ $node */ Node $node): ?LanguageLevel
+            {
+                // https://www.php.net/manual/en/language.oop5.changelog.php
+                return match ((string) $node->name->name) {
+                    'void', 'iterable' => LanguageLevel::PHP7_0,
+                    'object' => LanguageLevel::PHP7_1,
+                    default => null
+                };
+            }
+        });
+        $this->register(Node\Stmt\Const_::class);
+        $this->register(Node\Stmt\Continue_::class);
+        $this->register(Node\Stmt\DeclareDeclare::class);
+        $this->register(Node\Stmt\Declare_::class);
+        $this->register(Node\Stmt\Do_::class);
+        $this->register(Node\Stmt\Echo_::class);
+        $this->register(Node\Stmt\ElseIf_::class);
+        $this->register(Node\Stmt\Else_::class);
+        $this->register(Node\Stmt\EnumCase::class, LanguageLevel::PHP8_1);
+        $this->register(Node\Stmt\Enum_::class, LanguageLevel::PHP8_1);
+        $this->register(Node\Stmt\Expression::class);
+        $this->register(Node\Stmt\Finally_::class, LanguageLevel::PHP5_5);
+        $this->register(Node\Stmt\For_::class);
+        $this->register(
+            Node\Stmt\Foreach_::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\Foreach_ $node */ Node $node): ?LanguageLevel
+                {
+                    // It is possible to iterate over an array of arrays and unpack the nested array into loop variables
+                    // by providing a list() as the value. (PHP 5 >= 5.5.0)
+                    // https://www.php.net/manual/en/control-structures.foreach.php#control-structures.foreach.list
+                    if ($node->valueVar instanceof Node\Expr\List_::class) {
+                        return LanguageLevel::PHP5_5;
+                    }
+
+                    // https://wiki.php.net/rfc/short_list_syntax
+                    if ($node->valueVar instanceof Node\Expr\Array_::class) {
+                        return LanguageLevel::PHP7_1;
+                    }
+
+                    return null;
+                }
+            }
+        );
+        $this->register(Node\Stmt\Function_::class);
+        $this->register(Node\Stmt\Global_::class);
+        $this->register(Node\Stmt\Goto_::class, LanguageLevel::PHP5_3);
+        $this->register(Node\Stmt\GroupUse::class, LanguageLevel::PHP7_0);
+        $this->register(Node\Stmt\HaltCompiler::class);
+        $this->register(Node\Stmt\If_::class);
+        $this->register(Node\Stmt\InlineHTML::class);
+        $this->register(Node\Stmt\Interface_::class);
+        $this->register(Node\Stmt\Label::class, LanguageLevel::PHP5_3);
+        $this->register(Node\Stmt\Namespace_::class, LanguageLevel::PHP5_3);
+        $this->register(Node\Stmt\Nop::class);
+        $this->register(
+            Node\Stmt\Property::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\Property $node */ Node $node): ?LanguageLevel
+                {
+                    // As of PHP 8.1.0, a property can be declared with the readonly modifier, which prevents
+                    // modification of the property after initialization.
+                    // https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.readonly-properties
+                    if ($node->flags & Node\Stmt\Class_::MODIFIER_READONLY) {
+                        return LanguageLevel::PHP8_1;
+                    }
+
+                    // As of PHP 7.4.0, property definitions can include a Type declarations, with the exception of callable.
+                    // https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.typed-properties
+                    if (!empty($node->type)) {
+                        return LanguageLevel::PHP7_4;
+                    }
+
+                    return null;
+                }
+            }
+        );
+        $this->register(Node\Stmt\PropertyProperty::class);
+        $this->register(Node\Stmt\Return_::class);
+        $this->register(Node\Stmt\StaticVar::class);
+        $this->register(Node\Stmt\Static_::class);
+        $this->register(Node\Stmt\Switch_::class);
+        // As of PHP 8.0.0, the throw keyword is an expression and may be used in any expression context.
+        $this->register(Node\Stmt\Throw_::class, to: LanguageLevel::PHP7_4);
+        $this->register(Node\Stmt\TraitUse::class, LanguageLevel::PHP5_4);
+        $this->register(Node\Stmt\Trait_::class, LanguageLevel::PHP5_4);
+        $this->register(Node\Stmt\TryCatch::class);
+        $this->register(Node\Stmt\Unset_::class);
+        $this->register(Node\Stmt\UseUse::class, LanguageLevel::PHP5_3);
+        $this->register(Node\Stmt\Use_::class, LanguageLevel::PHP5_3);
+        $this->register(Node\Stmt\While_::class);
+
+        $this->register(Node\Stmt\TraitUseAdaptation\Alias::class, LanguageLevel::PHP5_4);
+        $this->register(Node\Stmt\TraitUseAdaptation\Precedence::class, LanguageLevel::PHP5_4);
     }
 
     protected function registerOtherInformation()
     {
-        // TODO: Finish :-)
+        $this->register(
+            Node\Arg::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Arg $node */ Node $node): ?LanguageLevel
+                {
+                    // As of PHP 8.0.0, named arguments can be used to skip over multiple optional parameters.
+                    if (!empty($node->name)) {
+                        return LanguageLevel::PHP8_0;
+                    }
+
+                    // https://wiki.php.net/rfc/argument_unpacking
+                    if ($node->unpack) {
+                        return LanguageLevel::PHP5_6;
+                    }
+
+                    return null;
+                }
+            }
+        );
+        $this->register(Node\Attribute::class, LanguageLevel::PHP8_0);
+        $this->register(Node\AttributeGroup::class, LanguageLevel::PHP8_0);
+        $this->register(Node\Const_::class);
+        $this->register(Node\Identifier::class);
+        // https://wiki.php.net/rfc/pure-intersection-types
+        $this->register(Node\IntersectionType::class, LanguageLevel::PHP8_1);
+        $this->register(Node\MatchArm::class, LanguageLevel::PHP8_0);
+        $this->register(Node\Name::class, LanguageLevel::PHP5_3);
+        $this->register(Node\NullableType::class, LanguageLevel::PHP7_1);
+        $this->register(
+            Node\Param::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Param $node */ Node $node): ?LanguageLevel
+                {
+                    // Default parameter values may be scalar values, arrays, the special type null, and as of
+                    // PHP 8.1.0, objects using the new ClassName() syntax.
+                    // https://www.php.net/manual/en/functions.arguments.php
+                    if (!empty($node->default) && $node->default instanceof Node\Expr\New_::class) {
+                        return LanguageLevel::PHP8_1;
+                    }
+
+                    if ($node->variadic) {
+                        return LanguageLevel::PHP5_6;
+                    }
+
+                    return null;
+                }
+            }
+        );
+        $this->register(Node\UnionType::class, LanguageLevel::PHP8_0);
+        $this->register(Node\VarLikeIdentifier::class);
+        $this->register(Node\VariadicPlaceholder::class, LanguageLevel::PHP8_1);
     }
 }
