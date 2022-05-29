@@ -55,23 +55,54 @@ final class NodeInformationRepository
 
     protected function registerExprInformation()
     {
-        $this->register(Node\Expr\ArrayDimFetch::class);
+        $this->register(
+                  Node\Expr\ArrayDimFetch::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\ArrayDimFetch $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/functionarraydereferencing
+                          if ($node->var instanceof Node\Expr\CallLike) {
+                              return LanguageLevel::PHP5_4;
+                          }
+
+                          // https://wiki.php.net/rfc/constdereference
+                          if ($node->var instanceof Node\Expr\Array_ || $node->var instanceof Node\Scalar\String_) {
+                              return LanguageLevel::PHP5_5;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Expr\ArrayItem::class);
-        $this->register(Node\Expr\Array_::class);
+        $this->register(
+                  Node\Expr\Array_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\Array_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/shortsyntaxforarrays
+                          if ($node->getAttribute('kind') === Node\Expr\Array_::KIND_SHORT) {
+                              return LanguageLevel::PHP5_4;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Expr\ArrowFunction::class, LanguageLevel::PHP7_4);
         $this->register(
-            Node\Expr\Assign::class,
+                  Node\Expr\Assign::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Expr\Assign $node */ Node $node): ?LanguageLevel
-                {
-                    // https://wiki.php.net/rfc/short_list_syntax
-                    if ($node->var instanceof Node\Expr\Array_::class) {
-                        return LanguageLevel::PHP7_1;
-                    }
+                      public function inspect(/** @var Node\Expr\Assign $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/short_list_syntax
+                          if ($node->var instanceof Node\Expr\Array_::class) {
+                              return LanguageLevel::PHP7_1;
+                          }
 
-                    return null;
-                }
-            }
+                          return null;
+                      }
+                  }
         );
         $this->register(Node\Expr\AssignOp::class);
         $this->register(Node\Expr\AssignRef::class);
@@ -79,18 +110,18 @@ final class NodeInformationRepository
         $this->register(Node\Expr\BitwiseNot::class);
         $this->register(Node\Expr\BooleanNot::class);
         $this->register(
-            Node\Expr\ClassConstFetch::class,
+                  Node\Expr\ClassConstFetch::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Expr\ClassConstFetch $node */ Node $node): ?LanguageLevel
-                {
-                    // https://www.php.net/manual/en/language.oop5.changelog.php
-                    if ((string) $node->name->name === 'class') {
-                        return LanguageLevel::PHP5_5;
-                    }
+                      public function inspect(/** @var Node\Expr\ClassConstFetch $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://www.php.net/manual/en/language.oop5.changelog.php
+                          if ((string)$node->name->name === 'class') {
+                              return LanguageLevel::PHP5_5;
+                          }
 
-                    return null;
-                }
-            }
+                          return null;
+                      }
+                  }
         );
         $this->register(Node\Expr\Clone_::class);
         $this->register(Node\Expr\Closure::class, LanguageLevel::PHP5_3);
@@ -120,12 +151,50 @@ final class NodeInformationRepository
                     }
                 }
         );
-        $this->register(Node\Expr\ConstFetch::class);
-        $this->register(Node\Expr\Empty_::class);
+        $this->register(
+                  Node\Expr\ConstFetch::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\ConstFetch $node */ Node $node): ?LanguageLevel
+                      {
+                          return match ((string)$node->name) {
+                              // https://wiki.php.net/rfc/e-user-deprecated-warning
+                              'E_USER_DEPRECATED' => LanguageLevel::PHP5_3,
+                              default => null
+                          };
+                      }
+                  }
+        );
+        $this->register(
+                  Node\Expr\Empty_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\Empty_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/empty_isset_exprs
+                          if (!$node->expr instanceof Node\Expr\Variable) {
+                              return LanguageLevel::PHP5_5;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Expr\ErrorSuppress::class);
         $this->register(Node\Expr\Eval_::class);
         $this->register(Node\Expr\Exit_::class);
-        $this->register(Node\Expr\FuncCall::class);
+        $this->register(
+                  Node\Expr\FuncCall::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\FuncCall $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/context_sensitive_lexer
+                          if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Expr\Include_::class);
         $this->register(
                   Node\Expr\Instanceof_::class,
@@ -148,10 +217,55 @@ final class NodeInformationRepository
                       }
                   }
         );
-        $this->register(Node\Expr\Isset_::class);
-        $this->register(Node\Expr\List_::class);
+        $this->register(
+                  Node\Expr\Isset_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\Isset_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/empty_isset_exprs
+                          if (!$node->expr instanceof Node\Expr\Variable) {
+                              return LanguageLevel::PHP5_5;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
+        $this->register(
+                  Node\Expr\List_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\List_ $node */ Node $node): ?LanguageLevel
+                      {
+                          /** @var Node\Expr\ArrayItem $item */
+                          foreach ($node->items as $item) {
+                              // https://wiki.php.net/rfc/list_reference_assignment
+                              if ($item->byRef) {
+                                  return LanguageLevel::PHP7_2;
+                              }
+
+                              // https://wiki.php.net/rfc/list_keys
+                              if (!empty($item->key)) {
+                                  return LanguageLevel::PHP7_1;
+                              }
+                          }
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Expr\Match_::class, LanguageLevel::PHP8_0);
-        $this->register(Node\Expr\MethodCall::class);
+        $this->register(
+                  Node\Expr\MethodCall::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\MethodCall $node */ Node $node): ?LanguageLevel
+                      {
+                          if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(
                   Node\Expr\New_::class,
             from: new class implements LanguageLevelInspector {
@@ -179,7 +293,20 @@ final class NodeInformationRepository
         $this->register(Node\Expr\PreDec::class);
         $this->register(Node\Expr\PreInc::class);
         $this->register(Node\Expr\Print_::class);
-        $this->register(Node\Expr\PropertyFetch::class);
+        $this->register(
+                  Node\Expr\PropertyFetch::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Expr\PropertyFetch $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/context_sensitive_lexer
+                          if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Expr\ShellExec::class);
         $this->register(Node\Expr\StaticCall::class);
         $this->register(Node\Expr\StaticPropertyFetch::class);
@@ -192,11 +319,23 @@ final class NodeInformationRepository
         $this->register(Node\Expr\UnaryMinus::class);
         $this->register(Node\Expr\UnaryPlus::class);
         $this->register(Node\Expr\Variable::class);
-        $this->register(Node\Expr\YieldFrom::class, LanguageLevel::PHP5_5);
+        // https://wiki.php.net/rfc/generator-delegation
+        $this->register(Node\Expr\YieldFrom::class, LanguageLevel::PHP7_0);
         $this->register(Node\Expr\Yield_::class, LanguageLevel::PHP5_5);
 
         // https://www.php.net/manual/en/language.types.null.php#language.types.null.casting
         $this->register(Node\Expr\Cast::class, to: LanguageLevel::PHP7_1);
+
+        // https://wiki.php.net/rfc/pow-operator
+        $this->register(Node\Expr\AssignOp\Pow::class, LanguageLevel::PHP5_6);
+        $this->register(Node\Expr\BinaryOp\Pow::class, LanguageLevel::PHP5_6);
+
+        // https://wiki.php.net/rfc/isset_ternary
+        $this->register(Node\Expr\AssignOp\Coalesce::class, LanguageLevel::PHP7_0);
+        $this->register(Node\Expr\BinaryOp\Coalesce::class, LanguageLevel::PHP7_0);
+
+        // https://wiki.php.net/rfc/combined-comparison-operator
+        $this->register(Node\Expr\BinaryOp\Spaceship::class, LanguageLevel::PHP7_0);
 
         // TODO: Intelligently determine superclass during runtime using instanceof
         // TODO: Add tests for this!
@@ -233,11 +372,33 @@ final class NodeInformationRepository
                     return LanguageLevel::PHP7_4;
                 }
 
+                // https://wiki.php.net/rfc/binnotation4ints
+                if ($kind === Node\Scalar\LNumber::KIND_BIN) {
+                    return LanguageLevel::PHP5_4;
+                }
+
                 return null;
             }
         };
 
-        $this->register(Node\Scalar\LNumber::class, from: $resolveNumericFrom);
+        $this->register(
+                  Node\Scalar\LNumber::class,
+            from: $resolveNumericFrom,
+            // https://wiki.php.net/rfc/octal.overload-checking
+            to:   new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Scalar\LNumber $node */ Node $node): ?LanguageLevel
+                      {
+                          if (
+                              $node->getAttribute('kind') === Node\Scalar\LNumber::KIND_OCT &&
+                              strlen($rawValue = $node->getAttribute('rawValue')) === 3 &&
+                              in_array(substr($node->getAttribute('rawValue'), 0, 1), ['4', '5', '6', '7'])
+                          ) {
+                              return LanguageLevel::PHP7_0;
+                          }
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Scalar\DNumber::class, from: $resolveNumericFrom);
 
         // __DIR__ and __NAMESPACE__ were added in 5.3.0
@@ -256,19 +417,24 @@ final class NodeInformationRepository
         $this->register(Node\Stmt\Break_::class);
         $this->register(Node\Stmt\Case_::class);
         $this->register(
-            Node\Stmt\Catch_::class,
+                  Node\Stmt\Catch_::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\Catch_ $node */ Node $node): ?LanguageLevel
-                {
-                    // The variable was required prior to PHP 8.0.0.
-                    // https://www.php.net/manual/en/language.exceptions.php#language.exceptions.catch
-                    if (empty($node->var)) {
-                        return LanguageLevel::PHP8_0;
-                    }
+                      public function inspect(/** @var Node\Stmt\Catch_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // The variable was required prior to PHP 8.0.0.
+                          // https://www.php.net/manual/en/language.exceptions.php#language.exceptions.catch
+                          if (empty($node->var)) {
+                              return LanguageLevel::PHP8_0;
+                          }
 
-                    return null;
-                }
-            }
+                          // https://wiki.php.net/rfc/multiple-catch
+                          if (count($node->types) > 1) {
+                              return LanguageLevel::PHP7_1;
+                          }
+
+                          return null;
+                      }
+                  }
         );
         $this->register(
                   Node\Stmt\ClassConst::class,
@@ -291,44 +457,88 @@ final class NodeInformationRepository
                   }
         );
         $this->register(
-            Node\Stmt\ClassMethod::class,
+                  Node\Stmt\ClassMethod::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
-                {
-                    // https://www.php.net/manual/en/language.oop5.changelog.php
-                    return match((string) $node->name->name) {
-                        '__invoke', '__callStatic' => LanguageLevel::PHP5_3,
-                        '__debugInfo' => LanguageLevel::PHP5_6,
-                        '__serialize', '__unserialize' => LanguageLevel::PHP7_4,
-                        default => null
-                    };
-                }
-            },
+                      public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/return_types
+                          if (!empty($node->returnType)) {
+                              $returnType = (string)$node->returnType;
+
+                              // https://wiki.php.net/rfc/noreturn_type
+                              if ($returnType === 'noreturn') {
+                                  return LanguageLevel::PHP8_1;
+                              }
+
+                              // https://wiki.php.net/rfc/object-typehint
+                              if ($returnType === 'object') {
+                                  return LanguageLevel::PHP7_2;
+                              }
+
+                              // https://wiki.php.net/rfc/void_return_type
+                              // https://wiki.php.net/rfc/iterable
+                              if ($returnType === 'void' || $returnType === 'iterable') {
+                                  return LanguageLevel::PHP7_1;
+                              }
+
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          // https://wiki.php.net/rfc/context_sensitive_lexer
+                          if (Quirks::isSemiReservedKeyword($name = (string)$node->name->name)) {
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          // https://www.php.net/manual/en/language.oop5.changelog.php
+                          return match ($name) {
+                              '__invoke', '__callStatic' => LanguageLevel::PHP5_3,
+                              '__debugInfo' => LanguageLevel::PHP5_6,
+                              '__serialize', '__unserialize' => LanguageLevel::PHP7_4,
+                              default => null
+                          };
+                      }
+                  },
+            to:   new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://www.php.net/manual/en/language.oop5.changelog.php
+                          return match ((string)$node->name->name) {
+                              '__autoload' => LanguageLevel::PHP7_1,
+                              default => null
+                          };
+                      }
+                  }
+        );
+        $this->register(
+                Node\Stmt\Class_::class,
             to: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
+                    public function inspect(/** @var Node\Stmt\Class_ $node */ Node $node): ?LanguageLevel
+                    {
+                        // https://www.php.net/manual/en/language.oop5.changelog.php
+                        return match ((string)$node->name->name) {
+                            'void', 'iterable' => LanguageLevel::PHP7_0,
+                            'object' => LanguageLevel::PHP7_1,
+                            default => null
+                        };
+                    }
+                }
+        );
+        $this->register(
+            Node\Stmt\Const_::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\Const_ $node */ Node $node): ?LanguageLevel
                 {
-                    // https://www.php.net/manual/en/language.oop5.changelog.php
-                    return match((string) $node->name->name) {
-                        '__autoload' => LanguageLevel::PHP7_1,
-                        default => null
-                    };
+                    // https://wiki.php.net/rfc/new_in_initializers
+                    foreach ($node->consts as $const) {
+                        if ($const->value instanceof Node\Expr\New_::class) {
+                            return LanguageLevel::PHP8_1;
+                        }
+                    }
+
+                    return null;
                 }
             }
         );
-        $this->register(
-            Node\Stmt\Class_::class,
-            to: new class implements LanguageLevelInspector {
-            public function inspect(/** @var Node\Stmt\Class_ $node */ Node $node): ?LanguageLevel
-            {
-                // https://www.php.net/manual/en/language.oop5.changelog.php
-                return match ((string) $node->name->name) {
-                    'void', 'iterable' => LanguageLevel::PHP7_0,
-                    'object' => LanguageLevel::PHP7_1,
-                    default => null
-                };
-            }
-        });
-        $this->register(Node\Stmt\Const_::class);
         $this->register(Node\Stmt\Continue_::class);
         $this->register(Node\Stmt\DeclareDeclare::class);
         $this->register(Node\Stmt\Declare_::class);
@@ -342,27 +552,58 @@ final class NodeInformationRepository
         $this->register(Node\Stmt\Finally_::class, LanguageLevel::PHP5_5);
         $this->register(Node\Stmt\For_::class);
         $this->register(
-            Node\Stmt\Foreach_::class,
+                  Node\Stmt\Foreach_::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\Foreach_ $node */ Node $node): ?LanguageLevel
-                {
-                    // It is possible to iterate over an array of arrays and unpack the nested array into loop variables
-                    // by providing a list() as the value. (PHP 5 >= 5.5.0)
-                    // https://www.php.net/manual/en/control-structures.foreach.php#control-structures.foreach.list
-                    if ($node->valueVar instanceof Node\Expr\List_::class) {
-                        return LanguageLevel::PHP5_5;
-                    }
+                      public function inspect(/** @var Node\Stmt\Foreach_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // It is possible to iterate over an array of arrays and unpack the nested array into loop variables
+                          // by providing a list() as the value. (PHP 5 >= 5.5.0)
+                          // https://www.php.net/manual/en/control-structures.foreach.php#control-structures.foreach.list
+                          if ($node->valueVar instanceof Node\Expr\List_::class) {
+                              return LanguageLevel::PHP5_5;
+                          }
 
-                    // https://wiki.php.net/rfc/short_list_syntax
-                    if ($node->valueVar instanceof Node\Expr\Array_::class) {
-                        return LanguageLevel::PHP7_1;
-                    }
+                          // https://wiki.php.net/rfc/short_list_syntax
+                          if ($node->valueVar instanceof Node\Expr\Array_::class) {
+                              return LanguageLevel::PHP7_1;
+                          }
 
-                    return null;
-                }
-            }
+                          return null;
+                      }
+                  }
         );
-        $this->register(Node\Stmt\Function_::class);
+        $this->register(
+                  Node\Stmt\Function_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Stmt\Function_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/return_types
+                          if (!empty($node->returnType)) {
+                              $returnType = (string)$node->returnType;
+
+                              // https://wiki.php.net/rfc/noreturn_type
+                              if ($returnType === 'noreturn') {
+                                  return LanguageLevel::PHP8_1;
+                              }
+
+                              // https://wiki.php.net/rfc/object-typehint
+                              if ($returnType === 'object') {
+                                  return LanguageLevel::PHP7_2;
+                              }
+
+                              // https://wiki.php.net/rfc/void_return_type
+                              // https://wiki.php.net/rfc/iterable
+                              if ($returnType === 'void' || $returnType === 'iterable') {
+                                  return LanguageLevel::PHP7_1;
+                              }
+
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Stmt\Global_::class);
         $this->register(Node\Stmt\Goto_::class, LanguageLevel::PHP5_3);
         $this->register(Node\Stmt\GroupUse::class, LanguageLevel::PHP7_0);
@@ -374,30 +615,43 @@ final class NodeInformationRepository
         $this->register(Node\Stmt\Namespace_::class, LanguageLevel::PHP5_3);
         $this->register(Node\Stmt\Nop::class);
         $this->register(
-            Node\Stmt\Property::class,
+                  Node\Stmt\Property::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\Property $node */ Node $node): ?LanguageLevel
-                {
-                    // As of PHP 8.1.0, a property can be declared with the readonly modifier, which prevents
-                    // modification of the property after initialization.
-                    // https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.readonly-properties
-                    if ($node->flags & Node\Stmt\Class_::MODIFIER_READONLY) {
-                        return LanguageLevel::PHP8_1;
-                    }
+                      public function inspect(/** @var Node\Stmt\Property $node */ Node $node): ?LanguageLevel
+                      {
+                          // As of PHP 8.1.0, a property can be declared with the readonly modifier, which prevents
+                          // modification of the property after initialization.
+                          // https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.readonly-properties
+                          if ($node->flags & Node\Stmt\Class_::MODIFIER_READONLY) {
+                              return LanguageLevel::PHP8_1;
+                          }
 
-                    // As of PHP 7.4.0, property definitions can include a Type declarations, with the exception of callable.
-                    // https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.typed-properties
-                    if (!empty($node->type)) {
-                        return LanguageLevel::PHP7_4;
+                          // As of PHP 7.4.0, property definitions can include a Type declarations, with the exception of callable.
+                          // https://www.php.net/manual/en/language.oop5.properties.php#language.oop5.properties.typed-properties
+                          if (!empty($node->type)) {
+                              return LanguageLevel::PHP7_4;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
+        $this->register(Node\Stmt\PropertyProperty::class);
+        $this->register(Node\Stmt\Return_::class);
+        $this->register(
+            Node\Stmt\StaticVar::class,
+            from: new class implements LanguageLevelInspector {
+                public function inspect(/** @var Node\Stmt\StaticVar $node */ Node $node): ?LanguageLevel
+                {
+                    // https://wiki.php.net/rfc/new_in_initializers
+                    if ($node->default instanceof Node\Expr\New_::class) {
+                        return LanguageLevel::PHP8_1;
                     }
 
                     return null;
                 }
             }
         );
-        $this->register(Node\Stmt\PropertyProperty::class);
-        $this->register(Node\Stmt\Return_::class);
-        $this->register(Node\Stmt\StaticVar::class);
         $this->register(Node\Stmt\Static_::class);
         $this->register(Node\Stmt\Switch_::class);
         // As of PHP 8.0.0, the throw keyword is an expression and may be used in any expression context.
@@ -407,7 +661,20 @@ final class NodeInformationRepository
         $this->register(Node\Stmt\TryCatch::class);
         $this->register(Node\Stmt\Unset_::class);
         $this->register(Node\Stmt\UseUse::class, LanguageLevel::PHP5_3);
-        $this->register(Node\Stmt\Use_::class, LanguageLevel::PHP5_3);
+        $this->register(
+                  Node\Stmt\Use_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Stmt\Use_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/use_function
+                          if ($node->type === Node\Stmt\Use_::TYPE_FUNCTION) {
+                              return LanguageLevel::PHP5_6;
+                          }
+
+                          return LanguageLevel::PHP5_3;
+                      }
+                  }
+        );
         $this->register(Node\Stmt\While_::class);
 
         $this->register(Node\Stmt\TraitUseAdaptation\Alias::class, LanguageLevel::PHP5_4);
@@ -417,27 +684,60 @@ final class NodeInformationRepository
     protected function registerOtherInformation()
     {
         $this->register(
-            Node\Arg::class,
+                  Node\Arg::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Arg $node */ Node $node): ?LanguageLevel
-                {
-                    // As of PHP 8.0.0, named arguments can be used to skip over multiple optional parameters.
-                    if (!empty($node->name)) {
-                        return LanguageLevel::PHP8_0;
-                    }
+                      public function inspect(/** @var Node\Arg $node */ Node $node): ?LanguageLevel
+                      {
+                          // As of PHP 8.0.0, named arguments can be used to skip over multiple optional parameters.
+                          if (!empty($node->name)) {
+                              return LanguageLevel::PHP8_0;
+                          }
 
-                    // https://wiki.php.net/rfc/argument_unpacking
-                    if ($node->unpack) {
-                        return LanguageLevel::PHP5_6;
-                    }
+                          // https://wiki.php.net/rfc/argument_unpacking
+                          if ($node->unpack) {
+                              return LanguageLevel::PHP5_6;
+                          }
 
-                    return null;
-                }
-            }
+                          return null;
+                      }
+                  }
         );
-        $this->register(Node\Attribute::class, LanguageLevel::PHP8_0);
+        $this->register(
+                  Node\Attribute::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Attribute $node */ Node $node): ?LanguageLevel
+                      {
+                          foreach ($node->args as $arg) {
+                              // https://wiki.php.net/rfc/new_in_initializers
+                              if ($arg->value instanceof Node\Expr\New_::class) {
+                                  return LanguageLevel::PHP8_1;
+                              }
+                          }
+
+                          return LanguageLevel::PHP8_0;
+                      }
+                  }
+        );
         $this->register(Node\AttributeGroup::class, LanguageLevel::PHP8_0);
-        $this->register(Node\Const_::class);
+        $this->register(
+                  Node\Const_::class,
+            from: new class implements LanguageLevelInspector {
+                      public function inspect(/** @var Node\Const_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/context_sensitive_lexer
+                          if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                              return LanguageLevel::PHP7_0;
+                          }
+
+                          // https://wiki.php.net/rfc/const_scalar_exprs
+                          if (!$node->value instanceof Node\Scalar) {
+                              return LanguageLevel::PHP5_5;
+                          }
+
+                          return null;
+                      }
+                  }
+        );
         $this->register(Node\Identifier::class);
         // https://wiki.php.net/rfc/pure-intersection-types
         $this->register(Node\IntersectionType::class, LanguageLevel::PHP8_1);
@@ -445,24 +745,46 @@ final class NodeInformationRepository
         $this->register(Node\Name::class, LanguageLevel::PHP5_3);
         $this->register(Node\NullableType::class, LanguageLevel::PHP7_1);
         $this->register(
-            Node\Param::class,
+                  Node\Param::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Param $node */ Node $node): ?LanguageLevel
-                {
-                    // Default parameter values may be scalar values, arrays, the special type null, and as of
-                    // PHP 8.1.0, objects using the new ClassName() syntax.
-                    // https://www.php.net/manual/en/functions.arguments.php
-                    if (!empty($node->default) && $node->default instanceof Node\Expr\New_::class) {
-                        return LanguageLevel::PHP8_1;
-                    }
+                      public function inspect(/** @var Node\Param $node */ Node $node): ?LanguageLevel
+                      {
+                          // Default parameter values may be scalar values, arrays, the special type null, and as of
+                          // PHP 8.1.0, objects using the new ClassName() syntax.
+                          // https://www.php.net/manual/en/functions.arguments.php
+                          if (!empty($node->default) && $node->default instanceof Node\Expr\New_::class) {
+                              return LanguageLevel::PHP8_1;
+                          }
 
-                    if ($node->variadic) {
-                        return LanguageLevel::PHP5_6;
-                    }
+                          if (!empty($node->type)) {
+                              // https://wiki.php.net/rfc/object-typehint
+                              if ($node->type === 'object') {
+                                  return LanguageLevel::PHP7_2;
+                              }
 
-                    return null;
-                }
-            }
+                              // https://wiki.php.net/rfc/iterable
+                              if ($node->Type === 'iterable') {
+                                  return LanguageLevel::PHP7_1;
+                              }
+
+                              // https://wiki.php.net/rfc/scalar_type_hints_v5
+                              if (in_array((string)$node->type, ['int', 'float', 'string', 'bool'])) {
+                                  return LanguageLevel::PHP7_0;
+                              }
+                          }
+
+                          if ($node->variadic) {
+                              return LanguageLevel::PHP5_6;
+                          }
+
+                          // https://wiki.php.net/rfc/callable
+                          if (!empty($node->type) && (string)$node->type === 'callable') {
+                              return LanguageLevel::PHP5_4;
+                          }
+
+                          return null;
+                      }
+                  }
         );
         $this->register(Node\UnionType::class, LanguageLevel::PHP8_0);
         $this->register(Node\VarLikeIdentifier::class);

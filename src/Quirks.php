@@ -24,6 +24,21 @@ final class Quirks
         '_ENV',
     ];
 
+    // https://wiki.php.net/rfc/context_sensitive_lexer
+    const SEMI_RESERVED_KEYWORDS = [
+        'callable', 'class', 'trait', 'extends', 'implements', 'static', 'abstract', 'final', 'public', 'protected',
+        'private', 'const', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endwhile', 'and', 'global', 'goto',
+        'instanceof', 'insteadof', 'interface', 'namespace', 'new', 'or', 'xor', 'try', 'use', 'var', 'exit', 'list',
+        'clone', 'include', 'include_once', 'throw', 'array', 'print', 'echo', 'require', 'require_once', 'return',
+        'else', 'elseif', 'default', 'break', 'continue', 'switch', 'yield', 'function', 'if', 'endswitch', 'finally',
+        'for', 'foreach', 'declare', 'case', 'do', 'while', 'as', 'catch', 'die', 'self', 'parent',
+    ];
+
+    public static function isSemiReservedKeyword(string $name): bool
+    {
+        return in_array($name, self::SEMI_RESERVED_KEYWORDS);
+    }
+
     public static function isSuperGlobal(string $name): bool
     {
         return in_array($name, self::SUPERGLOBALS);
