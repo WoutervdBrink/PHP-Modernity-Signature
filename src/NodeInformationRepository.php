@@ -223,8 +223,10 @@ final class NodeInformationRepository
                       public function inspect(/** @var Node\Expr\Isset_ $node */ Node $node): ?LanguageLevel
                       {
                           // https://wiki.php.net/rfc/empty_isset_exprs
-                          if (!$node->expr instanceof Node\Expr\Variable) {
-                              return LanguageLevel::PHP5_5;
+                          foreach ($node->vars as $var) {
+                              if ($var instanceof Node\Expr\Variable) {
+                                  return LanguageLevel::PHP5_5;
+                              }
                           }
 
                           return null;
@@ -391,7 +393,7 @@ final class NodeInformationRepository
                           if (
                               $node->getAttribute('kind') === Node\Scalar\LNumber::KIND_OCT &&
                               strlen($rawValue = $node->getAttribute('rawValue')) === 3 &&
-                              in_array(substr($node->getAttribute('rawValue'), 0, 1), ['4', '5', '6', '7'])
+                              in_array(substr($rawValue, 0, 1), ['4', '5', '6', '7'])
                           ) {
                               return LanguageLevel::PHP7_0;
                           }
@@ -524,20 +526,20 @@ final class NodeInformationRepository
                 }
         );
         $this->register(
-            Node\Stmt\Const_::class,
+                  Node\Stmt\Const_::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\Const_ $node */ Node $node): ?LanguageLevel
-                {
-                    // https://wiki.php.net/rfc/new_in_initializers
-                    foreach ($node->consts as $const) {
-                        if ($const->value instanceof Node\Expr\New_::class) {
-                            return LanguageLevel::PHP8_1;
-                        }
-                    }
+                      public function inspect(/** @var Node\Stmt\Const_ $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/new_in_initializers
+                          foreach ($node->consts as $const) {
+                              if ($const->value instanceof Node\Expr\New_::class) {
+                                  return LanguageLevel::PHP8_1;
+                              }
+                          }
 
-                    return null;
-                }
-            }
+                          return null;
+                      }
+                  }
         );
         $this->register(Node\Stmt\Continue_::class);
         $this->register(Node\Stmt\DeclareDeclare::class);
@@ -639,18 +641,18 @@ final class NodeInformationRepository
         $this->register(Node\Stmt\PropertyProperty::class);
         $this->register(Node\Stmt\Return_::class);
         $this->register(
-            Node\Stmt\StaticVar::class,
+                  Node\Stmt\StaticVar::class,
             from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Stmt\StaticVar $node */ Node $node): ?LanguageLevel
-                {
-                    // https://wiki.php.net/rfc/new_in_initializers
-                    if ($node->default instanceof Node\Expr\New_::class) {
-                        return LanguageLevel::PHP8_1;
-                    }
+                      public function inspect(/** @var Node\Stmt\StaticVar $node */ Node $node): ?LanguageLevel
+                      {
+                          // https://wiki.php.net/rfc/new_in_initializers
+                          if ($node->default instanceof Node\Expr\New_::class) {
+                              return LanguageLevel::PHP8_1;
+                          }
 
-                    return null;
-                }
-            }
+                          return null;
+                      }
+                  }
         );
         $this->register(Node\Stmt\Static_::class);
         $this->register(Node\Stmt\Switch_::class);
