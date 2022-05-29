@@ -324,7 +324,7 @@ final class NodeInformationRepository
         $this->register(Node\Expr\Yield_::class, LanguageLevel::PHP5_5);
 
         // https://www.php.net/manual/en/language.types.null.php#language.types.null.casting
-        $this->register(Node\Expr\Cast::class, to: LanguageLevel::PHP7_1);
+        $this->register(Node\Expr\Cast\Unset_::class, to: LanguageLevel::PHP7_1);
 
         // https://wiki.php.net/rfc/pow-operator
         $this->register(Node\Expr\AssignOp\Pow::class, LanguageLevel::PHP5_6);
