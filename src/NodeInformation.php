@@ -38,7 +38,7 @@ final class NodeInformation
     }
 
     /**
-     * Get the language level in which the node was removed and/or deprecated, if any.
+     * Get the last language level before the level in which the node was removed and/or deprecated, if any.
      *
      * @param Node $node The node for which to retrieve the language level.
      * @return LanguageLevel|null
