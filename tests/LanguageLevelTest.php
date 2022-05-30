@@ -1,5 +1,7 @@
 <?php
 
+namespace Knevelina\Modernity\Tests;
+
 use Knevelina\Modernity\LanguageLevel;
 use PHPUnit\Framework\TestCase;
 
@@ -9,7 +11,7 @@ class LanguageLevelTest extends TestCase
      * @test
      * @dataProvider versions
      */
-    function it_has_major_versions(LanguageLevel $level, int $major): void
+    public function it_has_major_versions(LanguageLevel $level, int $major): void
     {
         $this->assertEquals($major, $level->getMajor());
     }
@@ -39,7 +41,7 @@ class LanguageLevelTest extends TestCase
      * @test
      * @dataProvider olderVersions
      */
-    function it_compares_versions(LanguageLevel $older, LanguageLevel $newer): void
+    public function it_compares_versions(LanguageLevel $older, LanguageLevel $newer): void
     {
         $this->assertTrue($older->isOlderThan($newer));
         $this->assertFalse($newer->isOlderThan($older));
