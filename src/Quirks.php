@@ -12,7 +12,7 @@ use function in_array;
  */
 final class Quirks
 {
-    const SUPERGLOBALS = [
+    private const SUPERGLOBALS = [
         'GLOBALS',
         '_SERVER',
         '_GET',
@@ -25,7 +25,7 @@ final class Quirks
     ];
 
     // https://wiki.php.net/rfc/context_sensitive_lexer
-    const SEMI_RESERVED_KEYWORDS = [
+    private const SEMI_RESERVED_KEYWORDS = [
         'callable', 'class', 'trait', 'extends', 'implements', 'static', 'abstract', 'final', 'public', 'protected',
         'private', 'const', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endwhile', 'and', 'global', 'goto',
         'instanceof', 'insteadof', 'interface', 'namespace', 'new', 'or', 'xor', 'try', 'use', 'var', 'exit', 'list',
