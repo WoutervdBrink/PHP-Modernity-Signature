@@ -12,7 +12,7 @@ final class NodeInformation
     public function __construct(
         private readonly string $class,
         private readonly LanguageLevelInspector $from,
-        private readonly LanguageLevelInspector $to
+        private readonly ?LanguageLevelInspector $to
     ) {
     }
 
@@ -45,7 +45,7 @@ final class NodeInformation
      */
     public function getTo(Node $node): ?LanguageLevel
     {
-        return $this->to->inspect($node);
+        return $this->to?->inspect($node);
     }
 
     public function isDeprecated(): bool

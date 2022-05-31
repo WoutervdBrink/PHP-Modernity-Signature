@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use PhpParser\Node;
 
 use function array_key_exists;
+use function is_subclass_of;
 use function str_contains;
 
 final class NodeInformationRepository
@@ -20,6 +21,23 @@ final class NodeInformationRepository
         $this->nodeMap = [];
 
         $this->registerInformation();
+    }
+
+    public function getNodeInformation(string $class): NodeInformation
+    {
+        if (array_key_exists($class, $this->nodeMap)) {
+            return $this->nodeMap[$class];
+        }
+
+        foreach ($this->nodeMap as $candidateClass => $information) {
+            if (is_subclass_of($class, $candidateClass)) {
+                return $information;
+            }
+        }
+
+        throw new InvalidArgumentException(
+            sprintf('No information on node "%s" has been registered!', $class)
+        );
     }
 
     /**
@@ -96,7 +114,7 @@ final class NodeInformationRepository
                 public function inspect(/** @var Node\Expr\Assign $node */ Node $node): ?LanguageLevel
                 {
                     // https://wiki.php.net/rfc/short_list_syntax
-                    if ($node->var instanceof Node\Expr\Array_::class) {
+                    if ($node->var instanceof Node\Expr\Array_) {
                         return LanguageLevel::PHP7_1;
                     }
 
@@ -280,7 +298,7 @@ final class NodeInformationRepository
                     }
 
                     // https://www.php.net/manual/en/language.oop5.anonymous.php
-                    if ($node->class instanceof Node\Stmt\Class_::class) {
+                    if ($node->class instanceof Node\Stmt\Class_) {
                         return LanguageLevel::PHP7_0;
                     }
 
@@ -517,7 +535,7 @@ final class NodeInformationRepository
                 public function inspect(/** @var Node\Stmt\Class_ $node */ Node $node): ?LanguageLevel
                 {
                     // https://www.php.net/manual/en/language.oop5.changelog.php
-                    return match ((string)$node->name->name) {
+                    return match ((string)$node->name?->name ?: '') {
                         'void', 'iterable' => LanguageLevel::PHP7_0,
                         'object' => LanguageLevel::PHP7_1,
                         default => null
@@ -532,7 +550,7 @@ final class NodeInformationRepository
                 {
                     // https://wiki.php.net/rfc/new_in_initializers
                     foreach ($node->consts as $const) {
-                        if ($const->value instanceof Node\Expr\New_::class) {
+                        if ($const->value instanceof Node\Expr\New_) {
                             return LanguageLevel::PHP8_1;
                         }
                     }
@@ -561,12 +579,12 @@ final class NodeInformationRepository
                     // It is possible to iterate over an array of arrays and unpack the nested array into loop variables
                     // by providing a list() as the value. (PHP 5 >= 5.5.0)
                     // https://www.php.net/manual/en/control-structures.foreach.php#control-structures.foreach.list
-                    if ($node->valueVar instanceof Node\Expr\List_::class) {
+                    if ($node->valueVar instanceof Node\Expr\List_) {
                         return LanguageLevel::PHP5_5;
                     }
 
                     // https://wiki.php.net/rfc/short_list_syntax
-                    if ($node->valueVar instanceof Node\Expr\Array_::class) {
+                    if ($node->valueVar instanceof Node\Expr\Array_) {
                         return LanguageLevel::PHP7_1;
                     }
 
@@ -646,7 +664,7 @@ final class NodeInformationRepository
                 public function inspect(/** @var Node\Stmt\StaticVar $node */ Node $node): ?LanguageLevel
                 {
                     // https://wiki.php.net/rfc/new_in_initializers
-                    if ($node->default instanceof Node\Expr\New_::class) {
+                    if ($node->default instanceof Node\Expr\New_) {
                         return LanguageLevel::PHP8_1;
                     }
 
@@ -711,7 +729,7 @@ final class NodeInformationRepository
                 {
                     foreach ($node->args as $arg) {
                         // https://wiki.php.net/rfc/new_in_initializers
-                        if ($arg->value instanceof Node\Expr\New_::class) {
+                        if ($arg->value instanceof Node\Expr\New_) {
                             return LanguageLevel::PHP8_1;
                         }
                     }
@@ -754,7 +772,7 @@ final class NodeInformationRepository
                     // Default parameter values may be scalar values, arrays, the special type null, and as of
                     // PHP 8.1.0, objects using the new ClassName() syntax.
                     // https://www.php.net/manual/en/functions.arguments.php
-                    if (!empty($node->default) && $node->default instanceof Node\Expr\New_::class) {
+                    if (!empty($node->default) && $node->default instanceof Node\Expr\New_) {
                         return LanguageLevel::PHP8_1;
                     }
 
@@ -765,7 +783,7 @@ final class NodeInformationRepository
                         }
 
                         // https://wiki.php.net/rfc/iterable
-                        if ($node->Type === 'iterable') {
+                        if ($node->type === 'iterable') {
                             return LanguageLevel::PHP7_1;
                         }
 
@@ -788,6 +806,7 @@ final class NodeInformationRepository
                 }
             }
         );
+        $this->register(Node\Scalar::class);
         $this->register(Node\UnionType::class, LanguageLevel::PHP8_0);
         $this->register(Node\VarLikeIdentifier::class);
         $this->register(Node\VariadicPlaceholder::class, LanguageLevel::PHP8_1);
