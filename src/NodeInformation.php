@@ -34,7 +34,7 @@ final class NodeInformation
      */
     public function getFrom(Node $node): LanguageLevel
     {
-        return $this->from->inspect($node);
+        return $this->from->inspect($node) ?: LanguageLevel::PHP5_2;
     }
 
     /**
