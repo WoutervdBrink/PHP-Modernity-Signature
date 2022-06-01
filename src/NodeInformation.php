@@ -10,20 +10,9 @@ use PhpParser\Node;
 final class NodeInformation
 {
     public function __construct(
-        private readonly string $class,
         private readonly LanguageLevelInspector $from,
         private readonly ?LanguageLevelInspector $to
     ) {
-    }
-
-    /**
-     * Get the class name of the AST node.
-     *
-     * @return string
-     */
-    public function getClass(): string
-    {
-        return $this->class;
     }
 
     /**

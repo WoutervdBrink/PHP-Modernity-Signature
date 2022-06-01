@@ -59,7 +59,7 @@ final class NodeInformationRepository
             );
         }
 
-        $this->nodeMap[$class] = new NodeInformation($class, $from, $to);
+        $this->nodeMap[$class] = new NodeInformation($from, $to);
     }
 
     protected function registerInformation()
