@@ -2,10 +2,196 @@
 
 namespace Knevelina\Modernity;
 
+use PhpParser\Node;
+
+/**
+ * Mapping from AST nodes to their subclasses.
+ *
+ * This class is generated automatically using scripts/determine_subclasses.php.
+ *
+ * DO NOT MODIFY THIS FILE! Instead, modify the script.
+ */
 final class SubclassInformationRegistrar implements NodeInformationRegistrar
 {
     public static function map(NodeInformationMapping $mapping): void
     {
-        /* mapping */
+         $mapping->map(Node\Arg::class, new SubclassInformation([]));
+         $mapping->map(Node\Attribute::class, new SubclassInformation([]));
+         $mapping->map(Node\AttributeGroup::class, new SubclassInformation([]));
+         $mapping->map(Node\ComplexType::class, new SubclassInformation([Node\IntersectionType::class, Node\NullableType::class, Node\UnionType::class]));
+         $mapping->map(Node\Const_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr::class, new SubclassInformation([Node\Expr\ArrayDimFetch::class, Node\Expr\ArrayItem::class, Node\Expr\Array_::class, Node\Expr\ArrowFunction::class, Node\Expr\Assign::class, Node\Expr\AssignOp::class, Node\Expr\AssignOp\BitwiseAnd::class, Node\Expr\AssignOp\BitwiseOr::class, Node\Expr\AssignOp\BitwiseXor::class, Node\Expr\AssignOp\Coalesce::class, Node\Expr\AssignOp\Concat::class, Node\Expr\AssignOp\Div::class, Node\Expr\AssignOp\Minus::class, Node\Expr\AssignOp\Mod::class, Node\Expr\AssignOp\Mul::class, Node\Expr\AssignOp\Plus::class, Node\Expr\AssignOp\Pow::class, Node\Expr\AssignOp\ShiftLeft::class, Node\Expr\AssignOp\ShiftRight::class, Node\Expr\AssignRef::class, Node\Expr\BinaryOp::class, Node\Expr\BinaryOp\BitwiseAnd::class, Node\Expr\BinaryOp\BitwiseOr::class, Node\Expr\BinaryOp\BitwiseXor::class, Node\Expr\BinaryOp\BooleanAnd::class, Node\Expr\BinaryOp\BooleanOr::class, Node\Expr\BinaryOp\Coalesce::class, Node\Expr\BinaryOp\Concat::class, Node\Expr\BinaryOp\Div::class, Node\Expr\BinaryOp\Equal::class, Node\Expr\BinaryOp\Greater::class, Node\Expr\BinaryOp\GreaterOrEqual::class, Node\Expr\BinaryOp\Identical::class, Node\Expr\BinaryOp\LogicalAnd::class, Node\Expr\BinaryOp\LogicalOr::class, Node\Expr\BinaryOp\LogicalXor::class, Node\Expr\BinaryOp\Minus::class, Node\Expr\BinaryOp\Mod::class, Node\Expr\BinaryOp\Mul::class, Node\Expr\BinaryOp\NotEqual::class, Node\Expr\BinaryOp\NotIdentical::class, Node\Expr\BinaryOp\Plus::class, Node\Expr\BinaryOp\Pow::class, Node\Expr\BinaryOp\ShiftLeft::class, Node\Expr\BinaryOp\ShiftRight::class, Node\Expr\BinaryOp\Smaller::class, Node\Expr\BinaryOp\SmallerOrEqual::class, Node\Expr\BinaryOp\Spaceship::class, Node\Expr\BitwiseNot::class, Node\Expr\BooleanNot::class, Node\Expr\CallLike::class, Node\Expr\Cast::class, Node\Expr\Cast\Array_::class, Node\Expr\Cast\Bool_::class, Node\Expr\Cast\Double::class, Node\Expr\Cast\Int_::class, Node\Expr\Cast\Object_::class, Node\Expr\Cast\String_::class, Node\Expr\Cast\Unset_::class, Node\Expr\ClassConstFetch::class, Node\Expr\Clone_::class, Node\Expr\Closure::class, Node\Expr\ClosureUse::class, Node\Expr\ConstFetch::class, Node\Expr\Empty_::class, Node\Expr\Error::class, Node\Expr\ErrorSuppress::class, Node\Expr\Eval_::class, Node\Expr\Exit_::class, Node\Expr\FuncCall::class, Node\Expr\Include_::class, Node\Expr\Instanceof_::class, Node\Expr\Isset_::class, Node\Expr\List_::class, Node\Expr\Match_::class, Node\Expr\MethodCall::class, Node\Expr\New_::class, Node\Expr\NullsafeMethodCall::class, Node\Expr\NullsafePropertyFetch::class, Node\Expr\PostDec::class, Node\Expr\PostInc::class, Node\Expr\PreDec::class, Node\Expr\PreInc::class, Node\Expr\Print_::class, Node\Expr\PropertyFetch::class, Node\Expr\ShellExec::class, Node\Expr\StaticCall::class, Node\Expr\StaticPropertyFetch::class, Node\Expr\Ternary::class, Node\Expr\Throw_::class, Node\Expr\UnaryMinus::class, Node\Expr\UnaryPlus::class, Node\Expr\Variable::class, Node\Expr\YieldFrom::class, Node\Expr\Yield_::class, Node\Scalar::class, Node\Scalar\DNumber::class, Node\Scalar\Encapsed::class, Node\Scalar\EncapsedStringPart::class, Node\Scalar\LNumber::class, Node\Scalar\MagicConst::class, Node\Scalar\MagicConst\Class_::class, Node\Scalar\MagicConst\Dir::class, Node\Scalar\MagicConst\File::class, Node\Scalar\MagicConst\Function_::class, Node\Scalar\MagicConst\Line::class, Node\Scalar\MagicConst\Method::class, Node\Scalar\MagicConst\Namespace_::class, Node\Scalar\MagicConst\Trait_::class, Node\Scalar\String_::class]));
+         $mapping->map(Node\Identifier::class, new SubclassInformation([Node\VarLikeIdentifier::class]));
+         $mapping->map(Node\IntersectionType::class, new SubclassInformation([]));
+         $mapping->map(Node\MatchArm::class, new SubclassInformation([]));
+         $mapping->map(Node\Name::class, new SubclassInformation([Node\Name\FullyQualified::class, Node\Name\Relative::class]));
+         $mapping->map(Node\NullableType::class, new SubclassInformation([]));
+         $mapping->map(Node\Param::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar::class, new SubclassInformation([Node\Scalar\DNumber::class, Node\Scalar\Encapsed::class, Node\Scalar\EncapsedStringPart::class, Node\Scalar\LNumber::class, Node\Scalar\MagicConst::class, Node\Scalar\MagicConst\Class_::class, Node\Scalar\MagicConst\Dir::class, Node\Scalar\MagicConst\File::class, Node\Scalar\MagicConst\Function_::class, Node\Scalar\MagicConst\Line::class, Node\Scalar\MagicConst\Method::class, Node\Scalar\MagicConst\Namespace_::class, Node\Scalar\MagicConst\Trait_::class, Node\Scalar\String_::class]));
+         $mapping->map(Node\Stmt::class, new SubclassInformation([Node\Stmt\Break_::class, Node\Stmt\Case_::class, Node\Stmt\Catch_::class, Node\Stmt\ClassConst::class, Node\Stmt\ClassLike::class, Node\Stmt\ClassMethod::class, Node\Stmt\Class_::class, Node\Stmt\Const_::class, Node\Stmt\Continue_::class, Node\Stmt\DeclareDeclare::class, Node\Stmt\Declare_::class, Node\Stmt\Do_::class, Node\Stmt\Echo_::class, Node\Stmt\ElseIf_::class, Node\Stmt\Else_::class, Node\Stmt\EnumCase::class, Node\Stmt\Enum_::class, Node\Stmt\Expression::class, Node\Stmt\Finally_::class, Node\Stmt\For_::class, Node\Stmt\Foreach_::class, Node\Stmt\Function_::class, Node\Stmt\Global_::class, Node\Stmt\Goto_::class, Node\Stmt\GroupUse::class, Node\Stmt\HaltCompiler::class, Node\Stmt\If_::class, Node\Stmt\InlineHTML::class, Node\Stmt\Interface_::class, Node\Stmt\Label::class, Node\Stmt\Namespace_::class, Node\Stmt\Nop::class, Node\Stmt\Property::class, Node\Stmt\PropertyProperty::class, Node\Stmt\Return_::class, Node\Stmt\StaticVar::class, Node\Stmt\Static_::class, Node\Stmt\Switch_::class, Node\Stmt\Throw_::class, Node\Stmt\TraitUse::class, Node\Stmt\TraitUseAdaptation::class, Node\Stmt\TraitUseAdaptation\Alias::class, Node\Stmt\TraitUseAdaptation\Precedence::class, Node\Stmt\Trait_::class, Node\Stmt\TryCatch::class, Node\Stmt\Unset_::class, Node\Stmt\UseUse::class, Node\Stmt\Use_::class, Node\Stmt\While_::class]));
+         $mapping->map(Node\UnionType::class, new SubclassInformation([]));
+         $mapping->map(Node\VarLikeIdentifier::class, new SubclassInformation([]));
+         $mapping->map(Node\VariadicPlaceholder::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ArrayDimFetch::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ArrayItem::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Array_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ArrowFunction::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Assign::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp::class, new SubclassInformation([Node\Expr\AssignOp\BitwiseAnd::class, Node\Expr\AssignOp\BitwiseOr::class, Node\Expr\AssignOp\BitwiseXor::class, Node\Expr\AssignOp\Coalesce::class, Node\Expr\AssignOp\Concat::class, Node\Expr\AssignOp\Div::class, Node\Expr\AssignOp\Minus::class, Node\Expr\AssignOp\Mod::class, Node\Expr\AssignOp\Mul::class, Node\Expr\AssignOp\Plus::class, Node\Expr\AssignOp\Pow::class, Node\Expr\AssignOp\ShiftLeft::class, Node\Expr\AssignOp\ShiftRight::class]));
+         $mapping->map(Node\Expr\AssignRef::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp::class, new SubclassInformation([Node\Expr\BinaryOp\BitwiseAnd::class, Node\Expr\BinaryOp\BitwiseOr::class, Node\Expr\BinaryOp\BitwiseXor::class, Node\Expr\BinaryOp\BooleanAnd::class, Node\Expr\BinaryOp\BooleanOr::class, Node\Expr\BinaryOp\Coalesce::class, Node\Expr\BinaryOp\Concat::class, Node\Expr\BinaryOp\Div::class, Node\Expr\BinaryOp\Equal::class, Node\Expr\BinaryOp\Greater::class, Node\Expr\BinaryOp\GreaterOrEqual::class, Node\Expr\BinaryOp\Identical::class, Node\Expr\BinaryOp\LogicalAnd::class, Node\Expr\BinaryOp\LogicalOr::class, Node\Expr\BinaryOp\LogicalXor::class, Node\Expr\BinaryOp\Minus::class, Node\Expr\BinaryOp\Mod::class, Node\Expr\BinaryOp\Mul::class, Node\Expr\BinaryOp\NotEqual::class, Node\Expr\BinaryOp\NotIdentical::class, Node\Expr\BinaryOp\Plus::class, Node\Expr\BinaryOp\Pow::class, Node\Expr\BinaryOp\ShiftLeft::class, Node\Expr\BinaryOp\ShiftRight::class, Node\Expr\BinaryOp\Smaller::class, Node\Expr\BinaryOp\SmallerOrEqual::class, Node\Expr\BinaryOp\Spaceship::class]));
+         $mapping->map(Node\Expr\BitwiseNot::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BooleanNot::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\CallLike::class, new SubclassInformation([Node\Expr\FuncCall::class, Node\Expr\MethodCall::class, Node\Expr\New_::class, Node\Expr\NullsafeMethodCall::class, Node\Expr\StaticCall::class]));
+         $mapping->map(Node\Expr\Cast::class, new SubclassInformation([Node\Expr\Cast\Array_::class, Node\Expr\Cast\Bool_::class, Node\Expr\Cast\Double::class, Node\Expr\Cast\Int_::class, Node\Expr\Cast\Object_::class, Node\Expr\Cast\String_::class, Node\Expr\Cast\Unset_::class]));
+         $mapping->map(Node\Expr\ClassConstFetch::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Clone_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Closure::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ClosureUse::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ConstFetch::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Empty_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Error::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ErrorSuppress::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Eval_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Exit_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\FuncCall::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Include_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Instanceof_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Isset_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\List_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Match_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\MethodCall::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\New_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\NullsafeMethodCall::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\NullsafePropertyFetch::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\PostDec::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\PostInc::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\PreDec::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\PreInc::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Print_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\PropertyFetch::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\ShellExec::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\StaticCall::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\StaticPropertyFetch::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Ternary::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Throw_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\UnaryMinus::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\UnaryPlus::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Variable::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\YieldFrom::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Yield_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\BitwiseAnd::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\BitwiseOr::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\BitwiseXor::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Coalesce::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Concat::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Div::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Minus::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Mod::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Mul::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Plus::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\Pow::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\ShiftLeft::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\AssignOp\ShiftRight::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\BitwiseAnd::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\BitwiseOr::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\BitwiseXor::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\BooleanAnd::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\BooleanOr::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Coalesce::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Concat::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Div::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Equal::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Greater::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\GreaterOrEqual::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Identical::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\LogicalAnd::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\LogicalOr::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\LogicalXor::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Minus::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Mod::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Mul::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\NotEqual::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\NotIdentical::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Plus::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Pow::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\ShiftLeft::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\ShiftRight::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Smaller::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\SmallerOrEqual::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\BinaryOp\Spaceship::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\Array_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\Bool_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\Double::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\Int_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\Object_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\String_::class, new SubclassInformation([]));
+         $mapping->map(Node\Expr\Cast\Unset_::class, new SubclassInformation([]));
+         $mapping->map(Node\Name\FullyQualified::class, new SubclassInformation([]));
+         $mapping->map(Node\Name\Relative::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\DNumber::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\Encapsed::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\EncapsedStringPart::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\LNumber::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst::class, new SubclassInformation([Node\Scalar\MagicConst\Class_::class, Node\Scalar\MagicConst\Dir::class, Node\Scalar\MagicConst\File::class, Node\Scalar\MagicConst\Function_::class, Node\Scalar\MagicConst\Line::class, Node\Scalar\MagicConst\Method::class, Node\Scalar\MagicConst\Namespace_::class, Node\Scalar\MagicConst\Trait_::class]));
+         $mapping->map(Node\Scalar\String_::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Class_::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Dir::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\File::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Function_::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Line::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Method::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Namespace_::class, new SubclassInformation([]));
+         $mapping->map(Node\Scalar\MagicConst\Trait_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Break_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Case_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Catch_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\ClassConst::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\ClassLike::class, new SubclassInformation([Node\Stmt\Class_::class, Node\Stmt\Enum_::class, Node\Stmt\Interface_::class, Node\Stmt\Trait_::class]));
+         $mapping->map(Node\Stmt\ClassMethod::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Class_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Const_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Continue_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\DeclareDeclare::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Declare_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Do_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Echo_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\ElseIf_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Else_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\EnumCase::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Enum_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Expression::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Finally_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\For_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Foreach_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Function_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Global_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Goto_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\GroupUse::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\HaltCompiler::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\If_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\InlineHTML::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Interface_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Label::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Namespace_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Nop::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Property::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\PropertyProperty::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Return_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\StaticVar::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Static_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Switch_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Throw_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\TraitUse::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\TraitUseAdaptation::class, new SubclassInformation([Node\Stmt\TraitUseAdaptation\Alias::class, Node\Stmt\TraitUseAdaptation\Precedence::class]));
+         $mapping->map(Node\Stmt\Trait_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\TryCatch::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Unset_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\UseUse::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\Use_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\While_::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\TraitUseAdaptation\Alias::class, new SubclassInformation([]));
+         $mapping->map(Node\Stmt\TraitUseAdaptation\Precedence::class, new SubclassInformation([]));
+
     }
 }

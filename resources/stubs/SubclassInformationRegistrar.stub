@@ -1,0 +1,20 @@
+<?php
+
+namespace Knevelina\Modernity;
+
+use PhpParser\Node;
+
+/**
+ * Mapping from AST nodes to their subclasses.
+ *
+ * This class is generated automatically using scripts/determine_subclasses.php.
+ *
+ * DO NOT MODIFY THIS FILE! Instead, modify the script.
+ */
+final class SubclassInformationRegistrar implements NodeInformationRegistrar
+{
+    public static function map(NodeInformationMapping $mapping): void
+    {
+{{ mapping }}
+    }
+}
