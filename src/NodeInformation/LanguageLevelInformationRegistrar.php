@@ -2,78 +2,34 @@
 
 namespace Knevelina\Modernity;
 
-use InvalidArgumentException;
 use PhpParser\Node;
 
-use function array_key_exists;
-use function is_subclass_of;
 use function str_contains;
 
-final class NodeInformationRepository
+final class LanguageLevelInformationRegistrar implements NodeInformationRegistrar
 {
-    /**
-     * @var array Mapping from class name to node information.
-     */
-    private array $nodeMap;
-
-    public function __construct()
+    public static function map(NodeInformationMapping $mapping): void
     {
-        $this->nodeMap = [];
-
-        $this->registerInformation();
+        self::mapExprInformation($mapping);
+        self::mapNameInformation($mapping);
+        self::mapScalarInformation($mapping);
+        self::mapStmtInformation($mapping);
+        self::mapOtherInformation($mapping);
     }
 
-    public function getNodeInformation(string $class): NodeInformation
-    {
-        if (array_key_exists($class, $this->nodeMap)) {
-            return $this->nodeMap[$class];
-        }
-
-        foreach ($this->nodeMap as $candidateClass => $information) {
-            if (is_subclass_of($class, $candidateClass)) {
-                return $information;
-            }
-        }
-
-        throw new InvalidArgumentException(
-            sprintf('No information on node "%s" has been registered!', $class)
-        );
-    }
-
-    /**
-     * Register information about a node.
-     *
-     * @param string $class The class to register information about
-     * @param LanguageLevelInspector $from The language level in which the node was introduced.
-     * @param LanguageLevelInspector|null $to The language level in which the node was removed and/or deprecated.
-     * @return void
-     */
-    protected function register(
+    private static function addMapping(
+        NodeInformationMapping $mapping,
         string $class,
         LanguageLevelInspector $from = LanguageLevel::PHP5_2,
         ?LanguageLevelInspector $to = null
     ): void {
-        if (array_key_exists($class, $this->nodeMap)) {
-            throw new InvalidArgumentException(
-                sprintf('Version information on node "%s" has already been registered!', $class)
-            );
-        }
-
-        $this->nodeMap[$class] = new NodeInformation($from, $to);
+        $mapping->map($class, new LanguageLevelInformation($from, $to));
     }
 
-    protected function registerInformation()
+    private static function mapExprInformation(NodeInformationMapping $mapping): void
     {
-        $this->registerExprInformation();
-        $this->registerNameInformation();
-        $this->registerScalarInformation();
-        $this->registerStmtInformation();
-        $this->registerOtherInformation();
-    }
-
-    protected function registerExprInformation()
-    {
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\ArrayDimFetch::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\ArrayDimFetch $node */ Node $node): ?LanguageLevel
@@ -92,8 +48,9 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\ArrayItem::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ArrayItem::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\Array_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\Array_ $node */ Node $node): ?LanguageLevel
@@ -107,8 +64,9 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\ArrowFunction::class, LanguageLevel::PHP7_4);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ArrowFunction::class, LanguageLevel::PHP7_4);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\Assign::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\Assign $node */ Node $node): ?LanguageLevel
@@ -122,12 +80,13 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\AssignOp::class);
-        $this->register(Node\Expr\AssignRef::class);
-        $this->register(Node\Expr\BinaryOp::class);
-        $this->register(Node\Expr\BitwiseNot::class);
-        $this->register(Node\Expr\BooleanNot::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\AssignOp::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\AssignRef::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BinaryOp::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BitwiseNot::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BooleanNot::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\ClassConstFetch::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\ClassConstFetch $node */ Node $node): ?LanguageLevel
@@ -141,9 +100,10 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\Clone_::class);
-        $this->register(Node\Expr\Closure::class, LanguageLevel::PHP5_3);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Clone_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Closure::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\ClosureUse::class,
             to: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\ClosureUse $node */ Node $node): ?LanguageLevel
@@ -169,7 +129,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\ConstFetch::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\ConstFetch $node */ Node $node): ?LanguageLevel
@@ -182,7 +143,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\Empty_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\Empty_ $node */ Node $node): ?LanguageLevel
@@ -196,10 +158,11 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\ErrorSuppress::class);
-        $this->register(Node\Expr\Eval_::class);
-        $this->register(Node\Expr\Exit_::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ErrorSuppress::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Eval_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Exit_::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\FuncCall::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\FuncCall $node */ Node $node): ?LanguageLevel
@@ -213,8 +176,9 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\Include_::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Include_::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\Instanceof_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\Instanceof_ $node */ Node $node): ?LanguageLevel
@@ -235,7 +199,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\Isset_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\Isset_ $node */ Node $node): ?LanguageLevel
@@ -251,7 +216,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\List_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\List_ $node */ Node $node): ?LanguageLevel
@@ -272,8 +238,9 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\Match_::class, LanguageLevel::PHP8_0);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Match_::class, LanguageLevel::PHP8_0);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\MethodCall::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\MethodCall $node */ Node $node): ?LanguageLevel
@@ -286,7 +253,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\New_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\New_ $node */ Node $node): ?LanguageLevel
@@ -306,14 +274,23 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\NullsafeMethodCall::class, LanguageLevel::PHP8_0);
-        $this->register(Node\Expr\NullsafePropertyFetch::class, LanguageLevel::PHP8_0);
-        $this->register(Node\Expr\PostDec::class);
-        $this->register(Node\Expr\PostInc::class);
-        $this->register(Node\Expr\PreDec::class);
-        $this->register(Node\Expr\PreInc::class);
-        $this->register(Node\Expr\Print_::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Expr\NullsafeMethodCall::class,
+            LanguageLevel::PHP8_0
+        );
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Expr\NullsafePropertyFetch::class,
+            LanguageLevel::PHP8_0
+        );
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PostDec::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PostInc::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PreDec::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PreInc::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Print_::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Expr\PropertyFetch::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\PropertyFetch $node */ Node $node): ?LanguageLevel
@@ -327,48 +304,64 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Expr\ShellExec::class);
-        $this->register(Node\Expr\StaticCall::class);
-        $this->register(Node\Expr\StaticPropertyFetch::class);
-        $this->register(Node\Expr\Ternary::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ShellExec::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\StaticCall::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\StaticPropertyFetch::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Ternary::class);
 
         // As of PHP 8.0.0, the throw keyword is an expression and may be used in any expression context.
         // https://www.php.net/manual/en/language.exceptions.php
-        $this->register(Node\Expr\Throw_::class, LanguageLevel::PHP8_0);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Throw_::class, LanguageLevel::PHP8_0);
 
-        $this->register(Node\Expr\UnaryMinus::class);
-        $this->register(Node\Expr\UnaryPlus::class);
-        $this->register(Node\Expr\Variable::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\UnaryMinus::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\UnaryPlus::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Variable::class);
         // https://wiki.php.net/rfc/generator-delegation
-        $this->register(Node\Expr\YieldFrom::class, LanguageLevel::PHP7_0);
-        $this->register(Node\Expr\Yield_::class, LanguageLevel::PHP5_5);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\YieldFrom::class, LanguageLevel::PHP7_0);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Yield_::class, LanguageLevel::PHP5_5);
 
         // https://www.php.net/manual/en/language.types.null.php#language.types.null.casting
-        $this->register(Node\Expr\Cast\Unset_::class, to: LanguageLevel::PHP7_1);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Expr\Cast\Unset_::class,
+            to: LanguageLevel::PHP7_1
+        );
 
         // https://wiki.php.net/rfc/pow-operator
-        $this->register(Node\Expr\AssignOp\Pow::class, LanguageLevel::PHP5_6);
-        $this->register(Node\Expr\BinaryOp\Pow::class, LanguageLevel::PHP5_6);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\AssignOp\Pow::class, LanguageLevel::PHP5_6);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BinaryOp\Pow::class, LanguageLevel::PHP5_6);
 
         // https://wiki.php.net/rfc/isset_ternary
-        $this->register(Node\Expr\AssignOp\Coalesce::class, LanguageLevel::PHP7_0);
-        $this->register(Node\Expr\BinaryOp\Coalesce::class, LanguageLevel::PHP7_0);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Expr\AssignOp\Coalesce::class,
+            LanguageLevel::PHP7_0
+        );
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Expr\BinaryOp\Coalesce::class,
+            LanguageLevel::PHP7_0
+        );
 
         // https://wiki.php.net/rfc/combined-comparison-operator
-        $this->register(Node\Expr\BinaryOp\Spaceship::class, LanguageLevel::PHP7_0);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Expr\BinaryOp\Spaceship::class,
+            LanguageLevel::PHP7_0
+        );
 
         // TODO: Intelligently determine superclass during runtime using instanceof
         // TODO: Add tests for this!
         // See also BinaryOp, AssignOp, Cast expressions
     }
 
-    protected function registerNameInformation()
+    private static function mapNameInformation(NodeInformationMapping $mapping): void
     {
-        $this->register(Node\Name\FullyQualified::class, LanguageLevel::PHP5_3);
-        $this->register(Node\Name\Relative::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Name\FullyQualified::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Name\Relative::class, LanguageLevel::PHP5_3);
     }
 
-    protected function registerScalarInformation()
+    private static function mapScalarInformation(NodeInformationMapping $mapping): void
     {
         // Numeric values have some quirks.
         $resolveNumericFrom = new class implements LanguageLevelInspector {
@@ -401,7 +394,8 @@ final class NodeInformationRepository
             }
         };
 
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Scalar\LNumber::class,
             from: $resolveNumericFrom,
             // https://wiki.php.net/rfc/octal.overload-checking
@@ -419,24 +413,37 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Scalar\DNumber::class, from: $resolveNumericFrom);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Scalar\DNumber::class, from: $resolveNumericFrom);
 
         // __DIR__ and __NAMESPACE__ were added in 5.3.0
-        $this->register(Node\Scalar\MagicConst\Dir::class, LanguageLevel::PHP5_3);
-        $this->register(Node\Scalar\MagicConst\Namespace_::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Scalar\MagicConst\Dir::class,
+            LanguageLevel::PHP5_3
+        );
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Scalar\MagicConst\Namespace_::class,
+            LanguageLevel::PHP5_3
+        );
 
         // __TRAIT__ was added in 5.4.0
-        $this->register(Node\Scalar\MagicConst\Trait_::class, LanguageLevel::PHP5_4);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Scalar\MagicConst\Trait_::class,
+            LanguageLevel::PHP5_4
+        );
 
         // All other constants have been around forever - this is caught by defining Scalar as an always-superclass
         // later in registerOtherInformation().
     }
 
-    protected function registerStmtInformation()
+    private static function mapStmtInformation(NodeInformationMapping $mapping): void
     {
-        $this->register(Node\Stmt\Break_::class);
-        $this->register(Node\Stmt\Case_::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Break_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Case_::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Catch_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Catch_ $node */ Node $node): ?LanguageLevel
@@ -456,7 +463,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\ClassConst::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\ClassConst $node */ Node $node): ?LanguageLevel
@@ -476,7 +484,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\ClassMethod::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
@@ -529,7 +538,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Class_::class,
             to: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Class_ $node */ Node $node): ?LanguageLevel
@@ -543,7 +553,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Const_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Const_ $node */ Node $node): ?LanguageLevel
@@ -559,19 +570,20 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Stmt\Continue_::class);
-        $this->register(Node\Stmt\DeclareDeclare::class);
-        $this->register(Node\Stmt\Declare_::class);
-        $this->register(Node\Stmt\Do_::class);
-        $this->register(Node\Stmt\Echo_::class);
-        $this->register(Node\Stmt\ElseIf_::class);
-        $this->register(Node\Stmt\Else_::class);
-        $this->register(Node\Stmt\EnumCase::class, LanguageLevel::PHP8_1);
-        $this->register(Node\Stmt\Enum_::class, LanguageLevel::PHP8_1);
-        $this->register(Node\Stmt\Expression::class);
-        $this->register(Node\Stmt\Finally_::class, LanguageLevel::PHP5_5);
-        $this->register(Node\Stmt\For_::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Continue_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\DeclareDeclare::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Declare_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Do_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Echo_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\ElseIf_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Else_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\EnumCase::class, LanguageLevel::PHP8_1);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Enum_::class, LanguageLevel::PHP8_1);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Expression::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Finally_::class, LanguageLevel::PHP5_5);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\For_::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Foreach_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Foreach_ $node */ Node $node): ?LanguageLevel
@@ -592,7 +604,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Function_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Function_ $node */ Node $node): ?LanguageLevel
@@ -624,17 +637,18 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Stmt\Global_::class);
-        $this->register(Node\Stmt\Goto_::class, LanguageLevel::PHP5_3);
-        $this->register(Node\Stmt\GroupUse::class, LanguageLevel::PHP7_0);
-        $this->register(Node\Stmt\HaltCompiler::class);
-        $this->register(Node\Stmt\If_::class);
-        $this->register(Node\Stmt\InlineHTML::class);
-        $this->register(Node\Stmt\Interface_::class);
-        $this->register(Node\Stmt\Label::class, LanguageLevel::PHP5_3);
-        $this->register(Node\Stmt\Namespace_::class, LanguageLevel::PHP5_3);
-        $this->register(Node\Stmt\Nop::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Global_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Goto_::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\GroupUse::class, LanguageLevel::PHP7_0);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\HaltCompiler::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\If_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\InlineHTML::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Interface_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Label::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Namespace_::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Nop::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Property::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Property $node */ Node $node): ?LanguageLevel
@@ -656,9 +670,10 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Stmt\PropertyProperty::class);
-        $this->register(Node\Stmt\Return_::class);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\PropertyProperty::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Return_::class);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\StaticVar::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\StaticVar $node */ Node $node): ?LanguageLevel
@@ -672,16 +687,17 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Stmt\Static_::class);
-        $this->register(Node\Stmt\Switch_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Static_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Switch_::class);
         // As of PHP 8.0.0, the throw keyword is an expression and may be used in any expression context.
-        $this->register(Node\Stmt\Throw_::class, to: LanguageLevel::PHP7_4);
-        $this->register(Node\Stmt\TraitUse::class, LanguageLevel::PHP5_4);
-        $this->register(Node\Stmt\Trait_::class, LanguageLevel::PHP5_4);
-        $this->register(Node\Stmt\TryCatch::class);
-        $this->register(Node\Stmt\Unset_::class);
-        $this->register(Node\Stmt\UseUse::class, LanguageLevel::PHP5_3);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Throw_::class, to: LanguageLevel::PHP7_4);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\TraitUse::class, LanguageLevel::PHP5_4);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Trait_::class, LanguageLevel::PHP5_4);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\TryCatch::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\Unset_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\UseUse::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Stmt\Use_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Stmt\Use_ $node */ Node $node): ?LanguageLevel
@@ -695,15 +711,24 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Stmt\While_::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Stmt\While_::class);
 
-        $this->register(Node\Stmt\TraitUseAdaptation\Alias::class, LanguageLevel::PHP5_4);
-        $this->register(Node\Stmt\TraitUseAdaptation\Precedence::class, LanguageLevel::PHP5_4);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Stmt\TraitUseAdaptation\Alias::class,
+            LanguageLevel::PHP5_4
+        );
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
+            Node\Stmt\TraitUseAdaptation\Precedence::class,
+            LanguageLevel::PHP5_4
+        );
     }
 
-    protected function registerOtherInformation()
+    private static function mapOtherInformation(NodeInformationMapping $mapping): void
     {
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Arg::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Arg $node */ Node $node): ?LanguageLevel
@@ -722,7 +747,8 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Attribute::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Attribute $node */ Node $node): ?LanguageLevel
@@ -738,8 +764,9 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\AttributeGroup::class, LanguageLevel::PHP8_0);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\AttributeGroup::class, LanguageLevel::PHP8_0);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Const_::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Const_ $node */ Node $node): ?LanguageLevel
@@ -758,13 +785,14 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Identifier::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Identifier::class);
         // https://wiki.php.net/rfc/pure-intersection-types
-        $this->register(Node\IntersectionType::class, LanguageLevel::PHP8_1);
-        $this->register(Node\MatchArm::class, LanguageLevel::PHP8_0);
-        $this->register(Node\Name::class, LanguageLevel::PHP5_3);
-        $this->register(Node\NullableType::class, LanguageLevel::PHP7_1);
-        $this->register(
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\IntersectionType::class, LanguageLevel::PHP8_1);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\MatchArm::class, LanguageLevel::PHP8_0);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Name::class, LanguageLevel::PHP5_3);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\NullableType::class, LanguageLevel::PHP7_1);
+        LanguageLevelInformationRegistrar::addMapping(
+            $mapping,
             Node\Param::class,
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Param $node */ Node $node): ?LanguageLevel
@@ -806,9 +834,9 @@ final class NodeInformationRepository
                 }
             }
         );
-        $this->register(Node\Scalar::class);
-        $this->register(Node\UnionType::class, LanguageLevel::PHP8_0);
-        $this->register(Node\VarLikeIdentifier::class);
-        $this->register(Node\VariadicPlaceholder::class, LanguageLevel::PHP8_1);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Scalar::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\UnionType::class, LanguageLevel::PHP8_0);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\VarLikeIdentifier::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\VariadicPlaceholder::class, LanguageLevel::PHP8_1);
     }
 }

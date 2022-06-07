@@ -5,12 +5,15 @@ namespace Knevelina\Modernity;
 use PhpParser\Node;
 
 /**
- * Information about an AST node.
+ * Language level information about an AST node.
  */
-final class NodeInformation
+final class LanguageLevelInformation implements NodeInformation
 {
     public function __construct(
+        /** The language level in which the node was first introduced. */
         private readonly LanguageLevelInspector $from,
+
+        /** The last language level before the level in which the node was removed and/or deprecated, if any. */
         private readonly ?LanguageLevelInspector $to
     ) {
     }
@@ -37,6 +40,11 @@ final class NodeInformation
         return $this->to?->inspect($node);
     }
 
+    /**
+     * Get whether the node is deprecated in the latest PHP version.
+     *
+     * @return bool
+     */
     public function isDeprecated(): bool
     {
         return !is_null($this->to);

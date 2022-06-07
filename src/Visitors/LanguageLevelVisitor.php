@@ -2,17 +2,17 @@
 
 namespace Knevelina\Modernity\Visitors;
 
-use Knevelina\Modernity\NodeInformationRepository;
+use Knevelina\Modernity\LanguageLevelInformationRegistrar;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class LanguageLevelVisitor extends NodeVisitorAbstract
+final class LanguageLevelVisitor extends NodeVisitorAbstract
 {
-    private NodeInformationRepository $repository;
+    private LanguageLevelInformationRegistrar $repository;
 
     public function __construct()
     {
-        $this->repository = new NodeInformationRepository();
+        $this->repository = new LanguageLevelInformationRegistrar();
     }
 
     public function leaveNode(Node $node)
