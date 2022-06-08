@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\Contracts;
 
 interface NodeInformation
 {

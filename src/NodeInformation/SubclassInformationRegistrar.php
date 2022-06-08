@@ -2,6 +2,7 @@
 
 namespace Knevelina\Modernity;
 
+use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
 use PhpParser\Node;
 
 /**

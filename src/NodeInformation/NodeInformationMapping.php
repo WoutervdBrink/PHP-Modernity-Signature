@@ -3,6 +3,7 @@
 namespace Knevelina\Modernity;
 
 use InvalidArgumentException;
+use Knevelina\Modernity\Contracts\NodeInformation;
 
 use function array_key_exists;
 use function get_class;

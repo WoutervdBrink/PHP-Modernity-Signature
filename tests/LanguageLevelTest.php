@@ -2,7 +2,7 @@
 
 namespace Knevelina\Modernity\Tests;
 
-use Knevelina\Modernity\LanguageLevel;
+use Knevelina\Modernity\Enums\LanguageLevel;
 use PHPUnit\Framework\TestCase;
 
 class LanguageLevelTest extends TestCase

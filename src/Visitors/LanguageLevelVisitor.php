@@ -2,24 +2,27 @@
 
 namespace Knevelina\Modernity\Visitors;
 
-use Knevelina\Modernity\LanguageLevelInformationRegistrar;
+use Knevelina\Modernity\LanguageLevelInformation;
+use Knevelina\Modernity\NodeInformationMapping;
+use Knevelina\Modernity\NodeInformationMappingFactory;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 final class LanguageLevelVisitor extends NodeVisitorAbstract
 {
-    private LanguageLevelInformationRegistrar $repository;
+    private NodeInformationMapping $mapping;
 
     public function __construct()
     {
-        $this->repository = new LanguageLevelInformationRegistrar();
+        $this->mapping = NodeInformationMappingFactory::withDefaultRegistrars();
     }
 
     public function leaveNode(Node $node)
     {
         $class = get_class($node);
 
-        $information = $this->repository->getNodeInformation($class);
+        /** @var LanguageLevelInformation $information */
+        $information = $this->mapping->get($class, LanguageLevelInformation::class);
 
         $node->setAttribute('from', $information->getFrom($node));
         $node->setAttribute('to', $information->getTo($node));

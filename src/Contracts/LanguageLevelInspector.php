@@ -1,7 +1,8 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\Contracts;
 
+use Knevelina\Modernity\Enums\LanguageLevel;
 use PhpParser\Node;
 
 /**

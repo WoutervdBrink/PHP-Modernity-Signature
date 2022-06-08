@@ -1,6 +1,8 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\Contracts;
+
+use Knevelina\Modernity\NodeInformationMapping;
 
 interface NodeInformationRegistrar
 {

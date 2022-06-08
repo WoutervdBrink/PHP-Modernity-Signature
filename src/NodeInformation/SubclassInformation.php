@@ -2,6 +2,8 @@
 
 namespace Knevelina\Modernity;
 
+use Knevelina\Modernity\Contracts\NodeInformation;
+
 /**
  * Information about the subclasses of (abstract) AST nodes.
  */

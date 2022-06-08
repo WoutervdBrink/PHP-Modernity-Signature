@@ -1,7 +1,8 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\Enums;
 
+use Knevelina\Modernity\Contracts\LanguageLevelInspector;
 use PhpParser\Node;
 
 use function version_compare;

@@ -2,6 +2,9 @@
 
 namespace Knevelina\Modernity;
 
+use Knevelina\Modernity\Contracts\LanguageLevelInspector;
+use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
+use Knevelina\Modernity\Enums\LanguageLevel;
 use PhpParser\Node;
 
 use function str_contains;

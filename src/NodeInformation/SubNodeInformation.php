@@ -3,18 +3,15 @@
 namespace Knevelina\Modernity;
 
 use InvalidArgumentException;
+use Knevelina\Modernity\Contracts\NodeInformation;
 use PhpParser\Node\Arg;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\ComplexType;
 use PhpParser\Node\Expr;
-
 use PhpParser\Node\Identifier;
-
 use PhpParser\Node\Name;
-
 use PhpParser\Node\Param;
 use PhpParser\Node\Stmt;
-
 use PhpParser\Node\VariadicPlaceholder;
 
 use function array_key_exists;
@@ -34,6 +31,14 @@ final class SubNodeInformation implements NodeInformation
     public function __construct(private readonly NodeInformationMapping $mapping)
     {
         $this->subNodeDefinitions = [];
+    }
+
+    /**
+     * @return array<string, SubNodeDefinition>
+     */
+    public function getSubNodeDefinitions(): array
+    {
+        return $this->subNodeDefinitions;
     }
 
     public function include(string $className): self
@@ -98,14 +103,6 @@ final class SubNodeInformation implements NodeInformation
     public function withArgs(): self
     {
         return $this->with('args', [Arg::class, VariadicPlaceholder::class], true);
-    }
-
-    /**
-     * @return array<string, SubNodeDefinition>
-     */
-    public function getSubNodeDefinitions(): array
-    {
-        return $this->subNodeDefinitions;
     }
 
     public function withType(string $subName = 'type'): self
