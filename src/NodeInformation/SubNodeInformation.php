@@ -55,7 +55,7 @@ final class SubNodeInformation implements NodeInformation
         $info = $this->mapping->get($className, SubNodeInformation::class);
 
         foreach ($info->getSubNodeDefinitions() as $subNode => $definition) {
-            $this->with($subNode, $definition->getClassNames(), $definition->isArray());
+            $this->with($subNode, $definition->getClassNames(), $definition->isArray(), $definition->isNullable());
         }
 
         return $this;

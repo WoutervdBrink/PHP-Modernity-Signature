@@ -2,8 +2,6 @@
 
 namespace Knevelina\Modernity\NodeInformation;
 
-use function in_array;
-
 final class SubNodeDefinition
 {
     /** @var string Allow 'null' as a sub node. */
@@ -19,11 +17,6 @@ final class SubNodeDefinition
     public const STRING = 'string';
 
     /**
-     * @var bool Whether 'null' is allowed as a sub node.
-     */
-    private readonly bool $isNullAllowed;
-
-    /**
      * The valid class name(s) for this sub node. Use the 'NULL' constant to allow null.
      *
      * @var array<string>
@@ -33,12 +26,13 @@ final class SubNodeDefinition
     public function __construct(
         array|string $classNames,
 
-        /** Whether the sub node is an array. */
-        private bool $isArray = false
+        /** @var bool Whether the sub node is an array. */
+        private bool $isArray,
+
+        /** @var bool Whether 'null' is allowed as a sub node. */
+        private readonly bool $nullable
     ) {
         $this->classNames = is_array($classNames) ? $classNames : [$classNames];
-
-        $this->isNullAllowed = in_array(self::NULL, $this->classNames);
     }
 
     /**
@@ -65,8 +59,8 @@ final class SubNodeDefinition
      * Get whether 'null' is allowed as a sub node.
      * @return bool
      */
-    public function isNullAllowed(): bool
+    public function isNullable(): bool
     {
-        return $this->isNullAllowed;
+        return $this->nullable;
     }
 }
