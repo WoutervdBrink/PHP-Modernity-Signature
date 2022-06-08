@@ -28,14 +28,14 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
     {
         self::addMapping($mapping, Node\Expr\ArrayDimFetch::class)
             ->withExpr('var')
-            ->with('dim', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('dim', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Expr\ArrayItem::class)
-            ->with('key', [SubNodeDefinition::NULL, Node\Expr::class])
+            ->with('key', Node\Expr::class, nullable: true)
             ->withExpr('value');
 
         self::addMapping($mapping, Node\Expr\Array_::class)
-            ->with('items', [SubNodeDefinition::NULL, Node\Expr\ArrayItem::class], true);
+            ->with('items', Node\Expr\ArrayItem::class, true, true);
 
         self::addMapping($mapping, Node\Expr\ArrowFunction::class)
             ->withParams()
@@ -94,7 +94,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->withExpr();
 
         self::addMapping($mapping, Node\Expr\Exit_::class)
-            ->with('expr', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('expr', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Expr\FuncCall::class)
             ->with('name', [Node\Name::class, Node\Expr::class])
@@ -111,7 +111,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->withExprs('vars');
 
         self::addMapping($mapping, Node\Expr\List_::class)
-            ->with('items', [SubNodeDefinition::NULL, Node\Expr\ArrayItem::class], true);
+            ->with('items', Node\Expr\ArrayItem::class, true, true);
 
         self::addMapping($mapping, Node\Expr\Match_::class)
             ->withExpr('cond')
@@ -167,7 +167,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Expr\Ternary::class)
             ->withExpr('cond', 'else')
-            ->with('if', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('if', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Expr\Throw_::class)
             ->withExpr();
@@ -185,8 +185,8 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->withExpr();
 
         self::addMapping($mapping, Node\Expr\Yield_::class)
-            ->with('key', [SubNodeDefinition::NULL, Node\Expr::class])
-            ->with('value', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('key', Node\Expr::class, nullable: true)
+            ->with('value', Node\Expr::class, nullable: true);
     }
 
     private static function mapNameInformation(NodeInformationMapping $mapping)
@@ -218,15 +218,15 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
     private static function mapStmtInformation(NodeInformationMapping $mapping)
     {
         self::addMapping($mapping, Node\Stmt\Break_::class)
-            ->with('num', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('num', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\Case_::class)
-            ->with('cond', [SubNodeDefinition::NULL, Node\Expr::class])
+            ->with('cond', Node\Expr::class, nullable: true)
             ->withStmts();
 
         self::addMapping($mapping, Node\Stmt\Catch_::class)
             ->with('types', Node\Name::class, true)
-            ->with('var', [SubNodeDefinition::NULL, Node\Expr\Variable::class])
+            ->with('var', Node\Expr\Variable::class, nullable: true)
             ->withStmts();
 
         self::addMapping($mapping, Node\Stmt\ClassConst::class)
@@ -234,7 +234,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->withAttrGroups();
 
         self::addMapping($mapping, Node\Stmt\ClassLike::class)
-            ->with('name', [SubNodeDefinition::NULL, Node\Identifier::class])
+            ->with('name', Node\Identifier::class, nullable: true)
             ->withStmts()
             ->withAttrGroups();
 
@@ -247,14 +247,14 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Stmt\Class_::class)
             ->include(Node\Stmt\ClassLike::class)
-            ->with('extends', [SubNodeDefinition::NULL, Node\Name::class])
+            ->with('extends', Node\Name::class, nullable: true)
             ->with('implements', Node\Name::class, true);
 
         self::addMapping($mapping, Node\Stmt\Const_::class)
             ->with('consts', Node\Const_::class, true);
 
         self::addMapping($mapping, Node\Stmt\Continue_::class)
-            ->with('num', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('num', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\DeclareDeclare::class)
             ->with('key', Node\Identifier::class)
@@ -280,11 +280,11 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, EnumCase::class)
             ->with('name', Node\Identifier::class)
-            ->with('expr', [SubNodeDefinition::NULL, Node\Expr::class])
+            ->with('expr', Node\Expr::class, nullable: true)
             ->withAttrGroups();
 
         self::addMapping($mapping, Node\Stmt\Enum_::class)
-            ->with('scalarType', [SubNodeDefinition::NULL, Node\Identifier::class])
+            ->with('scalarType', Node\Identifier::class, nullable: true)
             ->with('implements', Node\Name::class, true);
 
         self::addMapping($mapping, Node\Stmt\Expression::class)
@@ -299,7 +299,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Stmt\Foreach_::class)
             ->withExpr('expr', 'valueVar')
-            ->with('keyVar', [SubNodeDefinition::NULL, Node\Expr::class])
+            ->with('keyVar', Node\Expr::class, nullable: true)
             ->withStmts();
 
         self::addMapping($mapping, Node\Stmt\Function_::class)
@@ -326,7 +326,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->withExpr('cond')
             ->withStmts()
             ->with('elseifs', Node\Stmt\ElseIf_::class, true)
-            ->with('else', [SubNodeDefinition::NULL, Node\Stmt\Else_::class]);
+            ->with('else', Node\Stmt\Else_::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\InlineHTML::class)
             ->with('value', SubNodeDefinition::STRING);
@@ -338,7 +338,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->with('name', Node\Identifier::class);
 
         self::addMapping($mapping, Node\Stmt\Namespace_::class)
-            ->with('name', [SubNodeDefinition::NULL, Node\Name::class])
+            ->with('name', Node\Name::class, nullable: true)
             ->withStmts();
 
         self::addMapping($mapping, Node\Stmt\Nop::class);
@@ -350,14 +350,14 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Stmt\PropertyProperty::class)
             ->with('name', Node\VarLikeIdentifier::class)
-            ->with('default', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('default', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\Return_::class)
-            ->with('expr', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('expr', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\StaticVar::class)
             ->with('var', Node\Expr\Variable::class)
-            ->with('default', [SubNodeDefinition::NULL, Node\Expr::class]);
+            ->with('default', Node\Expr::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\Static_::class)
             ->with('vars', Node\Stmt\StaticVar::class, true);
@@ -374,7 +374,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->with('adaptations', Node\Stmt\TraitUseAdaptation::class, true);
 
         self::addMapping($mapping, Node\Stmt\TraitUseAdaptation::class)
-            ->with('trait', [SubNodeDefinition::NULL, Node\Name::class])
+            ->with('trait', Node\Name::class, nullable: true)
             ->with('method', Node\Identifier::class);
 
         self::addMapping($mapping, Node\Stmt\Trait_::class)
@@ -383,14 +383,14 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
         self::addMapping($mapping, Node\Stmt\TryCatch::class)
             ->withStmts()
             ->with('catches', Node\Stmt\Catch_::class, true)
-            ->with('finally', [SubNodeDefinition::NULL, Node\Stmt\Finally_::class]);
+            ->with('finally', Node\Stmt\Finally_::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\Unset_::class)
             ->withExprs('vars');
 
         self::addMapping($mapping, Node\Stmt\UseUse::class)
             ->with('name', Node\Name::class)
-            ->with('alias', [SubNodeDefinition::NULL, Node\Identifier::class]);
+            ->with('alias', Node\Identifier::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\Use_::class)
             ->with('uses', Node\Stmt\UseUse::class, true);
@@ -401,8 +401,8 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Stmt\TraitUseAdaptation\Alias::class)
             ->include(Node\Stmt\TraitUseAdaptation::class)
-            ->with('newModifier', [SubNodeDefinition::NULL, SubNodeDefinition::INT])
-            ->with('newName', [SubNodeDefinition::NULL, Node\Identifier::class]);
+            ->with('newModifier', SubNodeDefinition::INT, nullable: true)
+            ->with('newName', Node\Identifier::class, nullable: true);
 
         self::addMapping($mapping, Node\Stmt\TraitUseAdaptation\Precedence::class)
             ->include(Node\Stmt\TraitUseAdaptation::class)
@@ -412,7 +412,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
     private static function mapOtherInformation(NodeInformationMapping $mapping)
     {
         self::addMapping($mapping, Node\Arg::class)
-            ->with('name', [SubNodeDefinition::NULL, Node\Identifier::class])
+            ->with('name', Node\Identifier::class, nullable: true)
             ->withExpr('value');
 
         self::addMapping($mapping, Node\Attribute::class)
@@ -425,7 +425,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
         self::addMapping($mapping, Node\Const_::class)
             ->with('name', Node\Identifier::class)
             ->withExpr('value')
-            ->with('namespacedName', [SubNodeDefinition::NULL, Node\Name::class]);
+            ->with('namespacedName', Node\Name::class, nullable: true);
 
         self::addMapping($mapping, Node\Identifier::class)
             ->with('name', SubNodeDefinition::STRING);
@@ -434,7 +434,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->with('types', [Node\Identifier::class, Node\Name::class], true);
 
         self::addMapping($mapping, Node\MatchArm::class)
-            ->with('conds', [SubNodeDefinition::NULL, Node\Expr::class], true)
+            ->with('conds', Node\Expr::class, true, true)
             ->withExpr('body');
 
         self::addMapping($mapping, Node\Name::class);
@@ -445,7 +445,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
         self::addMapping($mapping, Node\Param::class)
             ->withType()
             ->withExpr('var')
-            ->with('default', [SubNodeDefinition::NULL, Node\Expr::class])
+            ->with('default', Node\Expr::class, nullable: true)
             ->withAttrGroups();
 
         self::addMapping($mapping, Node\UnionType::class)
