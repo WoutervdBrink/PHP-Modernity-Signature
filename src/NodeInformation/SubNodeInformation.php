@@ -4,6 +4,7 @@ namespace Knevelina\Modernity\NodeInformation;
 
 use InvalidArgumentException;
 use Knevelina\Modernity\Contracts\NodeInformation;
+use PhpParser\Node;
 use PhpParser\Node\Arg;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\ComplexType;
@@ -172,7 +173,7 @@ final class SubNodeInformation implements NodeInformation
      */
     public function withStmts(string $subNode = 'stmts', string ...$others): self
     {
-        return $this->withMultiple(Stmt::class, false, $subNode, ...$others);
+        return $this->withMultiple(Stmt::class, true, $subNode, ...$others);
     }
 
 

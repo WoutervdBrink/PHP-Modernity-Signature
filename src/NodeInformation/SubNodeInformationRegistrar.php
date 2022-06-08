@@ -3,7 +3,6 @@
 namespace Knevelina\Modernity\NodeInformation;
 
 use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
-use PhpParser\Builder\EnumCase;
 use PhpParser\Node;
 
 class SubNodeInformationRegistrar implements NodeInformationRegistrar
@@ -151,7 +150,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
             ->withExpr();
 
         self::addMapping($mapping, Node\Expr\PropertyFetch::class)
-            ->withExpr()
+            ->withExpr('var')
             ->with('name', [Node\Identifier::class, Node\Expr::class]);
 
         self::addMapping($mapping, Node\Expr\ShellExec::class);
@@ -278,7 +277,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
         self::addMapping($mapping, Node\Stmt\Else_::class)
             ->withStmts();
 
-        self::addMapping($mapping, EnumCase::class)
+        self::addMapping($mapping, Node\Stmt\EnumCase::class)
             ->with('name', Node\Identifier::class)
             ->with('expr', Node\Expr::class, nullable: true)
             ->withAttrGroups();

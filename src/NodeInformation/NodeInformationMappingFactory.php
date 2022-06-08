@@ -10,6 +10,7 @@ class NodeInformationMappingFactory
 
         LanguageLevelInformationRegistrar::map($mapping);
         SubclassInformationRegistrar::map($mapping);
+        SuperclassInformationRegistrar::map($mapping);
         SubNodeInformationRegistrar::map($mapping);
 
         return $mapping;

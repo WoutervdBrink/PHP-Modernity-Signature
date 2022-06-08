@@ -89,6 +89,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BinaryOp::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BitwiseNot::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\BooleanNot::class);
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Cast::class);
         LanguageLevelInformationRegistrar::addMapping(
             $mapping,
             Node\Expr\ClassConstFetch::class,
@@ -496,7 +497,11 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     // https://wiki.php.net/rfc/return_types
                     if (!empty($node->returnType)) {
-                        $returnType = (string)$node->returnType;
+                        $returnType = match(true) {
+                            $node->returnType instanceof Node\Identifier => $node->returnType->toString(),
+                            $node->returnType instanceof Node\Name => $node->returnType->toString(),
+                            $node->returnType instanceof Node\ComplexType => '',
+                        };
 
                         // https://wiki.php.net/rfc/noreturn_type
                         if ($returnType === 'noreturn') {
@@ -809,18 +814,24 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                     }
 
                     if (!empty($node->type)) {
+                        $type = match(true) {
+                            $node->type instanceof Node\Identifier => $node->type->toString(),
+                            $node->type instanceof Node\Name => $node->type->toString(),
+                            $node->type instanceof Node\ComplexType => '',
+                        };
+
                         // https://wiki.php.net/rfc/object-typehint
-                        if ($node->type === 'object') {
+                        if ($type === 'object') {
                             return LanguageLevel::PHP7_2;
                         }
 
                         // https://wiki.php.net/rfc/iterable
-                        if ($node->type === 'iterable') {
+                        if ($type === 'iterable') {
                             return LanguageLevel::PHP7_1;
                         }
 
                         // https://wiki.php.net/rfc/scalar_type_hints_v5
-                        if (in_array((string)$node->type, ['int', 'float', 'string', 'bool'])) {
+                        if (in_array($type, ['int', 'float', 'string', 'bool'])) {
                             return LanguageLevel::PHP7_0;
                         }
                     }
@@ -830,7 +841,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                     }
 
                     // https://wiki.php.net/rfc/callable
-                    if (!empty($node->type) && (string)$node->type === 'callable') {
+                    if (!empty($node->type) && $type === 'callable') {
                         return LanguageLevel::PHP5_4;
                     }
 
