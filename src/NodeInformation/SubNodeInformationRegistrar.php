@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\NodeInformation;
 
 use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
 use PhpParser\Builder\EnumCase;

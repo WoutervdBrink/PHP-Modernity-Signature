@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\NodeInformation;
 
 use InvalidArgumentException;
 use Knevelina\Modernity\Contracts\NodeInformation;
@@ -39,18 +39,18 @@ final class NodeInformationMapping
 
     public function get(string $class, string $type): NodeInformation
     {
-        if (!array_key_exists($class, $this->nodeMap)) {
-            throw new InvalidArgumentException(
-                sprintf('Information on node "%s" has not been registered!', $class)
-            );
+        if (array_key_exists($class, $this->nodeMap) && array_key_exists($type, $this->nodeMap[$class])) {
+            return $this->nodeMap[$class][$type];
         }
 
-        if (!array_key_exists($type, $this->nodeMap[$class])) {
-            throw new InvalidArgumentException(
+        foreach ($this->nodeMap as $candidateClass => $informations) {
+            if (\is_subclass_of($class, $candidateClass) && array_key_exists($type, $informations)) {
+                return $informations[$type];
+            }
+        }
+
+        throw new InvalidArgumentException(
                 sprintf('Information of type "%s" on node "%s" has not been registered!', $type, $class)
             );
-        }
-
-        return $this->nodeMap[$class][$type];
     }
 }

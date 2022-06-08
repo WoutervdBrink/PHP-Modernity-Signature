@@ -2,7 +2,7 @@
 
 namespace Knevelina\Modernity\Contracts;
 
-use Knevelina\Modernity\NodeInformationMapping;
+use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 
 interface NodeInformationRegistrar
 {

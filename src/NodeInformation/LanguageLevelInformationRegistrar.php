@@ -1,10 +1,11 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\NodeInformation;
 
 use Knevelina\Modernity\Contracts\LanguageLevelInspector;
 use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
 use Knevelina\Modernity\Enums\LanguageLevel;
+use Knevelina\Modernity\Quirks;
 use PhpParser\Node;
 
 use function str_contains;

@@ -2,9 +2,9 @@
 
 namespace Knevelina\Modernity\Visitors;
 
-use Knevelina\Modernity\LanguageLevelInformation;
-use Knevelina\Modernity\NodeInformationMapping;
-use Knevelina\Modernity\NodeInformationMappingFactory;
+use Knevelina\Modernity\NodeInformation\LanguageLevelInformation;
+use Knevelina\Modernity\NodeInformation\NodeInformationMappingFactory;
+use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

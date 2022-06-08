@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity;
+namespace Knevelina\Modernity\NodeInformation;
 
 use function in_array;
 

@@ -11,8 +11,8 @@ use function version_compare;
 
 enum LanguageLevel: string implements LanguageLevelInspector
 {
-    const OLDEST = LanguageLevel::PHP5_2;
-    const NEWEST = LanguageLevel::PHP8_2;
+    public const OLDEST = LanguageLevel::PHP5_2;
+    public const NEWEST = LanguageLevel::PHP8_2;
 
     case PHP5_2 = '5.2';
     case PHP5_3 = '5.3';

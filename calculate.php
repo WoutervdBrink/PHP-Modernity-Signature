@@ -1,13 +1,12 @@
 <?php
 
+use Knevelina\Modernity\Visitors\LanguageLevelVisitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
-
-use Knevelina\Modernity\Visitors\LanguageLevelVisitor;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
