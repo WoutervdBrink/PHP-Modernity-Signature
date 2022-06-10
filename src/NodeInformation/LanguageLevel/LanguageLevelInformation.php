@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\LanguageLevel;
 
 use Knevelina\Modernity\Contracts\LanguageLevelInspector;
 use Knevelina\Modernity\Contracts\NodeInformation;

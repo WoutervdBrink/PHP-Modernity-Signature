@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\SubNode;
 
 use function is_array;
 

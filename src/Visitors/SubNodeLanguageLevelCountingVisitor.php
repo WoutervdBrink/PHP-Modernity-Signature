@@ -5,9 +5,9 @@ namespace Knevelina\Modernity\Visitors;
 use InvalidArgumentException;
 use Knevelina\Modernity\Enums\LanguageLevel;
 use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
-use Knevelina\Modernity\NodeInformation\SubNodeDefinition;
-use Knevelina\Modernity\NodeInformation\SubNodeInformation;
-use Knevelina\Modernity\NodeInformation\SuperclassInformation;
+use Knevelina\Modernity\NodeInformation\SubNode\SubNodeDefinition;
+use Knevelina\Modernity\NodeInformation\SubNode\SubNodeInformation;
+use Knevelina\Modernity\NodeInformation\Superclass\SuperclassInformation;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 

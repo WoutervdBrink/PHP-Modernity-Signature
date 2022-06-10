@@ -1,8 +1,9 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\Superclass;
 
 use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
+use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 use PhpParser\Node;
 
 /**

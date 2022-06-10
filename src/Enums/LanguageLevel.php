@@ -9,9 +9,15 @@ use PhpParser\Node;
 use function usort;
 use function version_compare;
 
+/**
+ * Enumeration representing the various PHP language levels supported by the library.
+ */
 enum LanguageLevel: string implements LanguageLevelInspector
 {
+    /** @var LanguageLevel The oldest PHP language level supported  by the library. */
     public const OLDEST = LanguageLevel::PHP5_2;
+
+    /** @var LanguageLevel The newest PHP language level supported by the library. */
     public const NEWEST = LanguageLevel::PHP8_2;
 
     case PHP5_2 = '5.2';
@@ -60,16 +66,33 @@ enum LanguageLevel: string implements LanguageLevelInspector
         return $range;
     }
 
+    /**
+     * Get the major version component of the language level.
+     *
+     * @return int
+     */
     public function getMajor(): int
     {
         return substr($this->value, 0, strpos($this->value, '.'));
     }
 
+    /**
+     * Inspect whether the other language level is older than this language level.
+     *
+     * @param LanguageLevel $other
+     * @return bool
+     */
     public function isOlderThan(LanguageLevel $other): bool
     {
         return version_compare($this->value, $other->value, '<');
     }
 
+    /**
+     * Inspect whether the other language level is newer than this language level.
+     *
+     * @param LanguageLevel $other
+     * @return bool
+     */
     public function isNewerThan(LanguageLevel $other): bool
     {
         return version_compare($this->value, $other->value, '>');

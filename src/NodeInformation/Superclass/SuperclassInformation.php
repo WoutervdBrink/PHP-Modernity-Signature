@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\Superclass;
 
 class SuperclassInformation implements \Knevelina\Modernity\Contracts\NodeInformation
 {

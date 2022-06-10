@@ -1,10 +1,11 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\LanguageLevel;
 
 use Knevelina\Modernity\Contracts\LanguageLevelInspector;
 use Knevelina\Modernity\Contracts\NodeInformationRegistrar;
 use Knevelina\Modernity\Enums\LanguageLevel;
+use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 use Knevelina\Modernity\Quirks;
 use PhpParser\Node;
 

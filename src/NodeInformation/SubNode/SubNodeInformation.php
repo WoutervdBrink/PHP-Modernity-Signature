@@ -1,10 +1,10 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\SubNode;
 
 use InvalidArgumentException;
 use Knevelina\Modernity\Contracts\NodeInformation;
-use PhpParser\Node;
+use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 use PhpParser\Node\Arg;
 use PhpParser\Node\AttributeGroup;
 use PhpParser\Node\ComplexType;

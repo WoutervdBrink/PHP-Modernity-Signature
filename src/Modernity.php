@@ -2,6 +2,7 @@
 
 namespace Knevelina\Modernity;
 
+use Knevelina\Modernity\Enums\LanguageLevel;
 use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 use Knevelina\Modernity\NodeInformation\NodeInformationMappingFactory;
 use Knevelina\Modernity\Visitors\LanguageLevelCounter;

@@ -1,6 +1,6 @@
 <?php
 
-namespace Knevelina\Modernity\NodeInformation;
+namespace Knevelina\Modernity\NodeInformation\Subclass;
 
 use Knevelina\Modernity\Contracts\NodeInformation;
 

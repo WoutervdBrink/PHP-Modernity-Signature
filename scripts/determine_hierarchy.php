@@ -31,14 +31,14 @@ final class HierarchyDeterminator
         $this->removeDuplicates();
         $this->findSuperclasses();
 
-        self::putMapping('SubclassInformationRegistrar', $this->getTranslatedSubclassMapping());
-        self::putMapping('SuperclassInformationRegistrar', $this->getTranslatedSuperclassMapping());
+        self::putMapping('SubclassInformationRegistrar', 'Subclass/SubclassInformationRegistrar', $this->getTranslatedSubclassMapping());
+        self::putMapping('SuperclassInformationRegistrar', 'Superclass/SuperclassInformationRegistrar', $this->getTranslatedSuperclassMapping());
     }
 
-    private static function putMapping(string $stub, string $mapping): void
+    private static function putMapping(string $stub, string $destination, string $mapping): void
     {
         $from = __DIR__.'/../resources/stubs/'.$stub.'.stub';
-        $to = __DIR__.'/../src/NodeInformation/'.$stub.'.php';
+        $to = __DIR__.'/../src/NodeInformation/'.$destination.'.php';
 
         $stub = file_get_contents($from);
         $stub = str_replace('{{ mapping }}', $mapping, $stub);
