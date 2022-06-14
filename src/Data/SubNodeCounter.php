@@ -133,7 +133,15 @@ final class SubNodeCounter
         $class = self::getClass($subNode);
 
         if (!$this->definition->accepts($class)) {
-            if ($this->definition->accepts($subNodeClass = get_class($subNode))) {
+            if (!\is_object($subNode)) {
+                throw new DomainException(
+                    sprintf(
+                        'Sub node definition does not accept a sub node with pseudoclass %s - valid classes are [%s]',
+                        $class,
+                        implode(',', $this->definition->getClassNames())
+                    )
+                );
+            } else if ($this->definition->accepts($subNodeClass = get_class($subNode))) {
                 $class = $subNodeClass;
             } else {
                 throw new DomainException(
