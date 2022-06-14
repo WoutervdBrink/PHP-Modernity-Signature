@@ -1,16 +1,12 @@
 <?php
 
-namespace Knevelina\Modernity\Visitors;
+namespace Knevelina\Modernity\Data;
 
 use Knevelina\Modernity\Enums\LanguageLevel;
 
 class LanguageLevelCounter
 {
-    /** @var array<string, int> */
-    private array $counters = [];
-
-    /** @var int */
-    private int $hits = 0;
+    private LanguageLevelTuple $tuple;
 
     public function __construct()
     {
@@ -24,18 +20,14 @@ class LanguageLevelCounter
      */
     public function reset(): void
     {
-        $this->hits = 0;
-
-        foreach (LanguageLevel::cases() as $level) {
-            $this->counters[$level->name] = 0;
-        }
+        $this->tuple = new LanguageLevelTuple();
     }
 
     /**
      * Hit a sequence of language levels.
      *
      * @param LanguageLevel $start First value of the sequence.
-     * @param LanguageLevel $end Last value of the sequence, inclusive.
+     * @param LanguageLevel|null $end Last value of the sequence, inclusive.
      * @return void
      */
     public function hitRange(LanguageLevel $start, ?LanguageLevel $end): void
@@ -55,8 +47,7 @@ class LanguageLevelCounter
      */
     public function hit(LanguageLevel $level): void
     {
-        $this->counters[$level->name]++;
-        $this->hits++;
+        $this->tuple[$level] = $this->tuple[$level] + 1;
     }
 
     /**
@@ -67,22 +58,14 @@ class LanguageLevelCounter
      */
     public function get(LanguageLevel $level): int
     {
-        return $this->counters[$level->name];
+        return $this->tuple[$level];
     }
 
     /**
-     * @return array<string, int>
+     * @return LanguageLevelTuple
      */
-    public function getAll(): array
+    public function getTuple(): LanguageLevelTuple
     {
-        return $this->counters;
-    }
-
-    /**
-     * @return int
-     */
-    public function getHits(): int
-    {
-        return $this->hits;
+        return $this->tuple;
     }
 }

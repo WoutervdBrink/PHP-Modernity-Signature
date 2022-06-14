@@ -11,7 +11,7 @@ try {
     }
     $modernity = new Modernity();
 
-    $modernity->runForFile($file);
+    echo $modernity->getTupleForFile($file).PHP_EOL;
 } catch (\PhpParser\Error $e) {
     echo 'Parse error: ' . $e->getMessage() . PHP_EOL;
     exit(1);

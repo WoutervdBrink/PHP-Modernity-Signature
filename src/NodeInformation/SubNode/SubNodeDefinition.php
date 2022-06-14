@@ -2,6 +2,8 @@
 
 namespace Knevelina\Modernity\NodeInformation\SubNode;
 
+use function array_unique;
+use function in_array;
 use function is_array;
 
 final class SubNodeDefinition
@@ -25,11 +27,6 @@ final class SubNodeDefinition
      */
     private array $classNames;
 
-    /**
-     * @var string Unique identifier of this sub node definition.
-     */
-    private readonly string $identifier;
-
     public function __construct(
         array|string $classNames,
 
@@ -41,14 +38,18 @@ final class SubNodeDefinition
     ) {
         $this->classNames = is_array($classNames) ? $classNames : [$classNames];
 
+        if ($this->nullable) {
+            $this->classNames[] = SubNodeDefinition::NULL;
+        }
+
         sort($this->classNames);
 
-        $this->identifier = sprintf(
-            '{classNames=[%s],isArray=%s,nullable=%s}',
-            implode(',',$this->classNames),
-            $this->isArray ? 'yes' : 'no',
-            $this->nullable ? 'yes' : 'no'
-        );
+        $this->classNames = array_unique($this->classNames);
+    }
+
+    public function accepts(string $className): bool
+    {
+        return in_array($className, $this->classNames);
     }
 
     /**
@@ -59,14 +60,6 @@ final class SubNodeDefinition
     public function getClassNames(): array
     {
         return $this->classNames;
-    }
-
-    /**
-     * @return string
-     */
-    public function getIdentifier(): string
-    {
-        return $this->identifier;
     }
 
     /**

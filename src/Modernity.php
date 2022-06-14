@@ -2,12 +2,11 @@
 
 namespace Knevelina\Modernity;
 
-use Knevelina\Modernity\Enums\LanguageLevel;
+use Knevelina\Modernity\Data\LanguageLevelTuple;
 use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
 use Knevelina\Modernity\NodeInformation\NodeInformationMappingFactory;
-use Knevelina\Modernity\Visitors\LanguageLevelCounter;
 use Knevelina\Modernity\Visitors\LanguageLevelVisitor;
-use Knevelina\Modernity\Visitors\SubNodeLanguageLevelCountingVisitor;
+use Knevelina\Modernity\Visitors\ModernityVisitor;
 use PhpParser\Lexer;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
@@ -16,7 +15,6 @@ use PhpParser\ParserFactory;
 use RuntimeException;
 
 use function file_get_contents;
-use function str_repeat;
 
 final class Modernity
 {
@@ -32,8 +30,8 @@ final class Modernity
     /** @var NodeInformationMapping Mapping registry from AST node class names to information about them. */
     private readonly NodeInformationMapping $mapping;
 
-    /** @var SubNodeLanguageLevelCountingVisitor The visitor which counts the language levels of sub nodes. */
-    private readonly SubNodeLanguageLevelCountingVisitor $subNodeLanguageLevelCountingVisitor;
+    /** @var ModernityVisitor The visitor which counts the language levels of sub nodes. */
+    private readonly ModernityVisitor $modernityVisitor;
 
     /**
      * @var array The array of statements representing the AST that is currently being processed.
@@ -56,50 +54,25 @@ final class Modernity
             TraverserFactory::fromVisitors(new ParentConnectingVisitor()),
             TraverserFactory::fromVisitors(new LanguageLevelVisitor()),
             TraverserFactory::fromVisitors(
-                $this->subNodeLanguageLevelCountingVisitor = new SubNodeLanguageLevelCountingVisitor($this->mapping)
+                $this->modernityVisitor = new ModernityVisitor($this->mapping)
             ),
         ];
     }
 
-    public function runForFile(string $path): void
+    public function getTupleForFile(string $path): LanguageLevelTuple
     {
         $code = $this->getCodeFromFile($path);
 
-        $this->runForCode($code);
+        return $this->getTupleForCode($code);
     }
 
-    public function runForCode(string $code): void
+    public function getTupleForCode(string $code): LanguageLevelTuple
     {
         $this->parseString($code);
 
         $this->traverse();
 
-        foreach ($this->subNodeLanguageLevelCountingVisitor->getCounters() as $parentClassName => $subNodeCounters) {
-            echo $parentClassName . PHP_EOL;
-
-            foreach ($subNodeCounters as $subNodeName => $counters) {
-                echo '  '.$subNodeName.PHP_EOL;
-
-                $total = array_sum(array_map(fn (LanguageLevelCounter $counter): int => $counter->getHits(), $counters));
-
-                foreach ($counters as $className => $counter) {
-                    printf(
-                        '    %-50s (%5.1f%%) [%s]%s',
-                        $className,
-                        $total > 0 ? ($counter->getHits() / $total) * 100 : 0,
-                        implode(', ', array_map(fn(int $count): string => sprintf('%6d', $count), $counter->getAll())),
-                        PHP_EOL
-                    );
-
-                    printf(
-                        '%s[%s]%s',
-                        str_repeat(' ', 64),
-                        implode(', ', array_map(fn (int $count): string => sprintf('%5.1f%%', ($count / $counter->getHits()) * 100), $counter->getAll())),
-                        PHP_EOL
-                    );
-                }
-            }
-        }
+        return $this->modernityVisitor->getTuple();
     }
 
     private function getCodeFromFile(string $path): string
