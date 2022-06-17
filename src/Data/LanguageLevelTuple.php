@@ -33,9 +33,16 @@ final class LanguageLevelTuple implements ArrayAccess, Iterator, Stringable
 
     public function __construct()
     {
-        foreach (LanguageLevel::range() as $level) {
-            $this->values[self::getKey($level)] = 0;
+        static $initial;
+
+        if (!isset($initial)) {
+            $initial = [];
+            foreach (LanguageLevel::range() as $level) {
+                $initial[self::getKey($level)] = 0;
+            }
         }
+
+        $this->values = $initial;
 
         $this->key = 0;
     }

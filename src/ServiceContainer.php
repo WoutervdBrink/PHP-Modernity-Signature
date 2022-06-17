@@ -11,6 +11,6 @@ class ServiceContainer
     {
         static $mapping;
 
-        return $mapping ?: NodeInformationMappingFactory::withDefaultRegistrars();
+        return $mapping ?: $mapping = NodeInformationMappingFactory::withDefaultRegistrars();
     }
 }

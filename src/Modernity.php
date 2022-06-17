@@ -12,6 +12,9 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 use RuntimeException;
 
 use function file_get_contents;
@@ -57,6 +60,34 @@ final class Modernity
                 $this->modernityVisitor = new ModernityVisitor($this->mapping)
             ),
         ];
+    }
+
+    public function getTupleForDirectory(string $path): LanguageLevelTuple
+    {
+        $directory = new RecursiveDirectoryIterator($path);
+        $iterator = new RecursiveIteratorIterator($directory);
+        $files = new RegexIterator($iterator, '/^.+\.php5??$/i', RegexIterator::GET_MATCH);
+
+        $results = [];
+        $totalSize = 0;
+
+        foreach ($files as $matches) {
+            $path = $matches[0];
+
+            $results[] = (object)[
+                'path' => $path,
+                'size' => $size = filesize($path),
+                'tuple' => $this->getTupleForFile($path),
+            ];
+
+            $totalSize += $size;
+        }
+
+        return \array_reduce(
+            $results,
+            fn(LanguageLevelTuple $tuple, object $result) => $tuple->add($result->tuple->normalize()->scale($result->size / $totalSize)),
+            new LanguageLevelTuple()
+        );
     }
 
     public function getTupleForFile(string $path): LanguageLevelTuple
