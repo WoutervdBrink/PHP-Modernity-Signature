@@ -1,7 +1,6 @@
 <?php
 
 use HaydenPierce\ClassFinder\ClassFinder;
-use PhpParser\Node;
 use PhpParser\NodeAbstract;
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -31,14 +30,22 @@ final class HierarchyDeterminator
         $this->removeDuplicates();
         $this->findSuperclasses();
 
-        self::putMapping('SubclassInformationRegistrar', 'Subclass/SubclassInformationRegistrar', $this->getTranslatedSubclassMapping());
-        self::putMapping('SuperclassInformationRegistrar', 'Superclass/SuperclassInformationRegistrar', $this->getTranslatedSuperclassMapping());
+        self::putMapping(
+            'SubclassInformationRegistrar',
+            'Subclass/SubclassInformationRegistrar',
+            $this->getTranslatedSubclassMapping()
+        );
+        self::putMapping(
+            'SuperclassInformationRegistrar',
+            'Superclass/SuperclassInformationRegistrar',
+            $this->getTranslatedSuperclassMapping()
+        );
     }
 
     private static function putMapping(string $stub, string $destination, string $mapping): void
     {
-        $from = __DIR__.'/../resources/stubs/'.$stub.'.stub';
-        $to = __DIR__.'/../src/NodeInformation/'.$destination.'.php';
+        $from = __DIR__ . '/../resources/stubs/' . $stub . '.stub';
+        $to = __DIR__ . '/../src/NodeInformation/' . $destination . '.php';
 
         $stub = file_get_contents($from);
         $stub = str_replace('{{ mapping }}', $mapping, $stub);
@@ -87,7 +94,7 @@ final class HierarchyDeterminator
 
     private static function translateClassName(string $className): string
     {
-        return substr($className, strlen('PhpParser\\')).'::class';
+        return substr($className, strlen('PhpParser\\')) . '::class';
     }
 
     /**
@@ -97,7 +104,8 @@ final class HierarchyDeterminator
     {
         $classes = ClassFinder::getClassesInNamespace('PhpParser\\Node', ClassFinder::RECURSIVE_MODE);
 
-        $classes = array_filter($classes, fn(string $className): bool => is_subclass_of($className, NodeAbstract::class));
+        $classes = array_filter($classes, fn(string $className): bool => is_subclass_of($className, NodeAbstract::class)
+        );
 
         foreach ($classes as $className) {
             $this->subMap[$className] = [];
@@ -153,7 +161,7 @@ final class HierarchyDeterminator
 try {
     (new HierarchyDeterminator())->run();
 
-    echo 'Successfully added hierarchy mappings to registrar.'.PHP_EOL;
+    echo 'Successfully added hierarchy mappings to registrar.' . PHP_EOL;
 } catch (Exception $e) {
     echo 'Exception: ' . $e->getMessage() . PHP_EOL;
     exit(1);

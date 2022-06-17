@@ -17,6 +17,7 @@ use RecursiveIteratorIterator;
 use RegexIterator;
 use RuntimeException;
 
+use function array_reduce;
 use function file_get_contents;
 
 final class Modernity
@@ -83,9 +84,11 @@ final class Modernity
             $totalSize += $size;
         }
 
-        return \array_reduce(
+        return array_reduce(
             $results,
-            fn(LanguageLevelTuple $tuple, object $result) => $tuple->add($result->tuple->normalize()->scale($result->size / $totalSize)),
+            fn(LanguageLevelTuple $tuple, object $result) => $tuple->add(
+                $result->tuple->normalize()->scale($result->size / $totalSize)
+            ),
             new LanguageLevelTuple()
         );
     }

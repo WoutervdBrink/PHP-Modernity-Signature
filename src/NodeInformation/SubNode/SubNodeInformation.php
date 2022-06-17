@@ -177,7 +177,6 @@ final class SubNodeInformation implements NodeInformation
     }
 
 
-
     /**
      * Add a sub node which is a type definition.
      *

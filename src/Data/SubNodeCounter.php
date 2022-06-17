@@ -15,6 +15,7 @@ use function get_class;
 use function gettype;
 use function is_array;
 use function is_null;
+use function is_object;
 
 final class SubNodeCounter
 {
@@ -133,7 +134,7 @@ final class SubNodeCounter
         $class = self::getClass($subNode);
 
         if (!$this->definition->accepts($class)) {
-            if (!\is_object($subNode)) {
+            if (!is_object($subNode)) {
                 throw new DomainException(
                     sprintf(
                         'Sub node definition does not accept a sub node with pseudoclass %s - valid classes are [%s]',
@@ -141,17 +142,19 @@ final class SubNodeCounter
                         implode(',', $this->definition->getClassNames())
                     )
                 );
-            } else if ($this->definition->accepts($subNodeClass = get_class($subNode))) {
-                $class = $subNodeClass;
             } else {
-                throw new DomainException(
-                    sprintf(
-                        'Sub node definition does not accept a sub node with base class %s (subclass %s) - valid classes are [%s]',
-                        $class,
-                        get_class($subNode),
-                        implode(',', $this->definition->getClassNames())
-                    )
-                );
+                if ($this->definition->accepts($subNodeClass = get_class($subNode))) {
+                    $class = $subNodeClass;
+                } else {
+                    throw new DomainException(
+                        sprintf(
+                            'Sub node definition does not accept a sub node with base class %s (subclass %s) - valid classes are [%s]',
+                            $class,
+                            get_class($subNode),
+                            implode(',', $this->definition->getClassNames())
+                        )
+                    );
+                }
             }
         }
 

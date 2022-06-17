@@ -498,7 +498,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     // https://wiki.php.net/rfc/return_types
                     if (!empty($node->returnType)) {
-                        $returnType = match(true) {
+                        $returnType = match (true) {
                             $node->returnType instanceof Node\Identifier => $node->returnType->toString(),
                             $node->returnType instanceof Node\Name => $node->returnType->toString(),
                             $node->returnType instanceof Node\ComplexType => '',
@@ -815,7 +815,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                     }
 
                     if (!empty($node->type)) {
-                        $type = match(true) {
+                        $type = match (true) {
                             $node->type instanceof Node\Identifier => $node->type->toString(),
                             $node->type instanceof Node\Name => $node->type->toString(),
                             $node->type instanceof Node\ComplexType => '',

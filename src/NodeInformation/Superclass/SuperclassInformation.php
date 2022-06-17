@@ -2,7 +2,9 @@
 
 namespace Knevelina\Modernity\NodeInformation\Superclass;
 
-class SuperclassInformation implements \Knevelina\Modernity\Contracts\NodeInformation
+use Knevelina\Modernity\Contracts\NodeInformation;
+
+class SuperclassInformation implements NodeInformation
 {
     public function __construct(private readonly string $superclass)
     {

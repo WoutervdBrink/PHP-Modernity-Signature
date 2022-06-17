@@ -1,12 +1,11 @@
 <?php
 
-use Knevelina\Modernity\Enums\LanguageLevel;
 use Knevelina\Modernity\Modernity;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
 try {
-    $dir = __DIR__.'/src/';
+    $dir = __DIR__ . '/src/';
     if ($argc === 2) {
         $dir = $argv[1];
     }
