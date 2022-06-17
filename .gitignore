@@ -6,3 +6,5 @@
 
 # PHPUnit
 .phpunit.result.cache
+
+/resources/packages/*
