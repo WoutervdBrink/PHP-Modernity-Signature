@@ -3,6 +3,7 @@
 namespace Knevelina\Modernity;
 
 use Knevelina\Modernity\Data\LanguageLevelTuple;
+use Knevelina\Modernity\Data\LanguageLevelTupleStore;
 use Knevelina\Modernity\Visitors\LanguageLevelVisitor;
 use Knevelina\Modernity\Visitors\ModernityVisitor;
 use PhpParser\ErrorHandler;
@@ -33,6 +34,9 @@ final class Modernity
     /** @var ErrorHandler Error handler for the PHP parser. */
     private readonly ErrorHandler $errorHandler;
 
+    /** @var LanguageLevelTupleStore Store for previously seen files. */
+    private readonly LanguageLevelTupleStore $store;
+
     /** @var array<NodeTraverser> The traversers that traverse the AST. */
     private readonly array $traverserChain;
 
@@ -55,6 +59,8 @@ final class Modernity
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this->lexer);
 
         $this->errorHandler = new ErrorHandler\Collecting();
+
+        $this->store = ServiceContainer::languageLevelTupleStore();
 
         $this->traverserChain = [
             TraverserFactory::fromVisitors(new ParentConnectingVisitor()),
@@ -95,6 +101,12 @@ final class Modernity
 
     public function getTupleForFile(string $path): LanguageLevelTuple
     {
+        $key = hash_file('sha256', $path);
+
+        if ($this->store->has($key)) {
+            return $this->store->get($key);
+        }
+
         $code = $this->getCodeFromFile($path);
 
         $this->errorHandler->clearErrors();
@@ -107,6 +119,8 @@ final class Modernity
                 fwrite(STDERR, sprintf(' - %s%s', $error->getMessage(), PHP_EOL));
             }
         }
+
+        $this->store->set($key, $tuple);
 
         return $tuple;
     }
