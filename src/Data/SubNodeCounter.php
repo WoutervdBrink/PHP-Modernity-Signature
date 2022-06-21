@@ -156,7 +156,9 @@ final class SubNodeCounter
             }
         }
 
-        $this->counters[$class]->hit($from);
-        $this->encounters[$class]++;
+        if ($from !== LanguageLevel::OLDEST) {
+            $this->counters[$class]->hit($from);
+            $this->encounters[$class]++;
+        }
     }
 }
