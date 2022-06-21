@@ -3,8 +3,6 @@
 namespace Knevelina\Modernity;
 
 use Knevelina\Modernity\Data\LanguageLevelTuple;
-use Knevelina\Modernity\NodeInformation\NodeInformationMapping;
-use Knevelina\Modernity\NodeInformation\NodeInformationMappingFactory;
 use Knevelina\Modernity\Visitors\LanguageLevelVisitor;
 use Knevelina\Modernity\Visitors\ModernityVisitor;
 use PhpParser\Lexer;
@@ -31,9 +29,6 @@ final class Modernity
     /** @var array<NodeTraverser> The traversers that traverse the AST. */
     private readonly array $traverserChain;
 
-    /** @var NodeInformationMapping Mapping registry from AST node class names to information about them. */
-    private readonly NodeInformationMapping $mapping;
-
     /** @var ModernityVisitor The visitor which counts the language levels of sub nodes. */
     private readonly ModernityVisitor $modernityVisitor;
 
@@ -52,14 +47,10 @@ final class Modernity
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this->lexer);
 
-        $this->mapping = NodeInformationMappingFactory::withDefaultRegistrars();
-
         $this->traverserChain = [
             TraverserFactory::fromVisitors(new ParentConnectingVisitor()),
             TraverserFactory::fromVisitors(new LanguageLevelVisitor()),
-            TraverserFactory::fromVisitors(
-                $this->modernityVisitor = new ModernityVisitor($this->mapping)
-            ),
+            TraverserFactory::fromVisitors($this->modernityVisitor = new ModernityVisitor()),
         ];
     }
 
