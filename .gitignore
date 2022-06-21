@@ -8,3 +8,4 @@
 .phpunit.result.cache
 
 /resources/packages/*
+/resources/results/*
