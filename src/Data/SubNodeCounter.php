@@ -124,11 +124,11 @@ final class SubNodeCounter
         $this->hits++;
 
         $from = LanguageLevel::OLDEST;
-        $to = LanguageLevel::NEWEST;
+//        $to = LanguageLevel::NEWEST;
 
         if ($subNode instanceof Node) {
             $from = $subNode->getAttribute('from') ?: LanguageLevel::OLDEST;
-            $to = $subNode->getAttribute('to') ?: LanguageLevel::NEWEST;
+//            $to = $subNode->getAttribute('to') ?: LanguageLevel::NEWEST;
         }
 
         $class = self::getClass($subNode);
@@ -137,28 +137,26 @@ final class SubNodeCounter
             if (!is_object($subNode)) {
                 throw new DomainException(
                     sprintf(
-                        'Sub node definition does not accept a sub node with pseudoclass %s - valid classes are [%s]',
+                        'Sub node definition does not accept a sub node with pseudo class %s - valid classes are [%s]',
                         $class,
                         implode(',', $this->definition->getClassNames())
                     )
                 );
+            } elseif ($this->definition->accepts($subNodeClass = get_class($subNode))) {
+                $class = $subNodeClass;
             } else {
-                if ($this->definition->accepts($subNodeClass = get_class($subNode))) {
-                    $class = $subNodeClass;
-                } else {
-                    throw new DomainException(
-                        sprintf(
-                            'Sub node definition does not accept a sub node with base class %s (subclass %s) - valid classes are [%s]',
-                            $class,
-                            get_class($subNode),
-                            implode(',', $this->definition->getClassNames())
-                        )
-                    );
-                }
+                throw new DomainException(
+                    sprintf(
+                        'Sub node definition does not accept a sub node with base class %s (subclass %s) - valid classes are [%s]',
+                        $class,
+                        get_class($subNode),
+                        implode(',', $this->definition->getClassNames())
+                    )
+                );
             }
         }
 
-        $this->counters[$class]->hitRange($from, $to);
+        $this->counters[$class]->hit($from);
         $this->encounters[$class]++;
     }
 }
