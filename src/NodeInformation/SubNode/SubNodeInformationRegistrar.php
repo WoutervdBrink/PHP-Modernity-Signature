@@ -262,7 +262,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Stmt\Declare_::class)
             ->with('declares', Node\Stmt\DeclareDeclare::class, true)
-            ->withStmts();
+            ->with('stmts', Node\Stmt::class, true, true);
 
         self::addMapping($mapping, Node\Stmt\Do_::class)
             ->withStmts()
