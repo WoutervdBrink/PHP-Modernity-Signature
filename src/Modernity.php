@@ -5,7 +5,9 @@ namespace Knevelina\Modernity;
 use Knevelina\Modernity\Data\LanguageLevelTuple;
 use Knevelina\Modernity\Visitors\LanguageLevelVisitor;
 use Knevelina\Modernity\Visitors\ModernityVisitor;
+use PhpParser\ErrorHandler;
 use PhpParser\Lexer;
+use PhpParser\Node\Stmt\Nop;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor\ParentConnectingVisitor;
 use PhpParser\Parser;
@@ -18,6 +20,8 @@ use RuntimeException;
 use function array_reduce;
 use function file_get_contents;
 
+use const STDERR;
+
 final class Modernity
 {
     /** @var Lexer Lexer for PHP code. */
@@ -25,6 +29,9 @@ final class Modernity
 
     /** @var Parser Parser for PHP code. */
     private readonly Parser $parser;
+
+    /** @var ErrorHandler Error handler for the PHP parser. */
+    private readonly ErrorHandler $errorHandler;
 
     /** @var array<NodeTraverser> The traversers that traverse the AST. */
     private readonly array $traverserChain;
@@ -46,6 +53,8 @@ final class Modernity
         );
 
         $this->parser = (new ParserFactory())->create(ParserFactory::PREFER_PHP7, $this->lexer);
+
+        $this->errorHandler = new ErrorHandler\Collecting();
 
         $this->traverserChain = [
             TraverserFactory::fromVisitors(new ParentConnectingVisitor()),
@@ -88,7 +97,18 @@ final class Modernity
     {
         $code = $this->getCodeFromFile($path);
 
-        return $this->getTupleForCode($code);
+        $this->errorHandler->clearErrors();
+
+        $tuple = $this->getTupleForCode($code);
+
+        if ($this->errorHandler->hasErrors()) {
+            fwrite(STDERR, sprintf('Warning: parse error(s) in file %s:%s', $path, PHP_EOL));
+            foreach ($this->errorHandler->getErrors() as $error) {
+                fwrite(STDERR, sprintf(' - %s%s', $error->getMessage(), PHP_EOL));
+            }
+        }
+
+        return $tuple;
     }
 
     public function getTupleForCode(string $code): LanguageLevelTuple
@@ -113,7 +133,9 @@ final class Modernity
 
     private function parseString(string $code): void
     {
-        $this->ast = $this->parser->parse($code);
+        $this->errorHandler->clearErrors();
+
+        $this->ast = $this->parser->parse($code, $this->errorHandler) ?? [new Nop()];
     }
 
     private function traverse(): void

@@ -167,24 +167,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ErrorSuppress::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Eval_::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Exit_::class);
-        LanguageLevelInformationRegistrar::addMapping(
-            $mapping,
-            Node\Expr\FuncCall::class,
-            from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Expr\FuncCall $node */ Node $node): ?LanguageLevel
-                {
-                    // https://wiki.php.net/rfc/context_sensitive_lexer
-                    if (
-                        $node->name instanceof Node\Expr\Variable &&
-                        is_string($node->name->name) &&
-                        Quirks::isSemiReservedKeyword($node->name->name)) {
-                        return LanguageLevel::PHP7_0;
-                    }
-
-                    return null;
-                }
-            }
-        );
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\FuncCall::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Include_::class);
         LanguageLevelInformationRegistrar::addMapping(
             $mapping,
@@ -194,7 +177,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     // As of PHP 8.0.0, instanceof can now be used with arbitrary expressions.
                     // https://www.php.net/instanceof
-                    if ($node->class instanceof Node\Expr) {
+                    if ($node->class instanceof Node\Expr && !$node->class instanceof Node\Expr\Variable) {
                         return LanguageLevel::PHP8_0;
                     }
 
@@ -273,7 +256,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     // As of PHP 8.0.0, using new with arbitrary expressions is supported.
                     // https://www.php.net/manual/en/language.oop5.basic.php#language.oop5.basic.new
-                    if ($node->class instanceof Node\Expr) {
+                    if ($node->class instanceof Node\Expr && !$node->class instanceof Node\Expr\Variable && !$node->class instanceof Node\Expr\PropertyFetch && !$node->class instanceof Node\Expr\ArrayDimFetch) {
                         return LanguageLevel::PHP8_0;
                     }
 
@@ -301,24 +284,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PreDec::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PreInc::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Print_::class);
-        LanguageLevelInformationRegistrar::addMapping(
-            $mapping,
-            Node\Expr\PropertyFetch::class,
-            from: new class implements LanguageLevelInspector {
-                public function inspect(/** @var Node\Expr\PropertyFetch $node */ Node $node): ?LanguageLevel
-                {
-                    // https://wiki.php.net/rfc/context_sensitive_lexer
-                    if (
-                        $node->name instanceof Node\Expr\Variable &&
-                        is_string($node->name->name) &&
-                        Quirks::isSemiReservedKeyword($node->name->name)) {
-                        return LanguageLevel::PHP7_0;
-                    }
-
-                    return null;
-                }
-            }
-        );
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\PropertyFetch::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ShellExec::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\StaticCall::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\StaticPropertyFetch::class);
@@ -364,10 +330,6 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
             Node\Expr\BinaryOp\Spaceship::class,
             LanguageLevel::PHP7_0
         );
-
-        // TODO: Intelligently determine superclass during runtime using instanceof
-        // TODO: Add tests for this!
-        // See also BinaryOp, AssignOp, Cast expressions
     }
 
     private static function mapNameInformation(NodeInformationMapping $mapping): void
@@ -508,8 +470,8 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                     // https://wiki.php.net/rfc/return_types
                     if (!empty($node->returnType)) {
                         $returnType = match (true) {
-                            $node->returnType instanceof Node\Identifier => $node->returnType->toString(),
-                            $node->returnType instanceof Node\Name => $node->returnType->toString(),
+                            $node->returnType instanceof Node\Identifier, $node->returnType instanceof Node\Name => $node->returnType->toString(
+                            ),
                             $node->returnType instanceof Node\ComplexType => '',
                         };
 
@@ -631,7 +593,11 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     // https://wiki.php.net/rfc/return_types
                     if (!empty($node->returnType)) {
-                        $returnType = (string)$node->returnType;
+                        $returnType = match (true) {
+                            $node->returnType instanceof Node\Identifier, $node->returnType instanceof Node\Name => $node->returnType->toString(
+                            ),
+                            $node->returnType instanceof Node\ComplexType => '',
+                        };
 
                         // https://wiki.php.net/rfc/noreturn_type
                         if ($returnType === 'noreturn') {
@@ -825,8 +791,8 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
 
                     if (!empty($node->type)) {
                         $type = match (true) {
-                            $node->type instanceof Node\Identifier => $node->type->toString(),
-                            $node->type instanceof Node\Name => $node->type->toString(),
+                            $node->type instanceof Node\Identifier, $node->type instanceof Node\Name => $node->type->toString(
+                            ),
                             $node->type instanceof Node\ComplexType => '',
                         };
 
@@ -844,15 +810,15 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                         if (in_array($type, ['int', 'float', 'string', 'bool'])) {
                             return LanguageLevel::PHP7_0;
                         }
+
+                        // https://wiki.php.net/rfc/callable
+                        if ($type === 'callable') {
+                            return LanguageLevel::PHP5_4;
+                        }
                     }
 
                     if ($node->variadic) {
                         return LanguageLevel::PHP5_6;
-                    }
-
-                    // https://wiki.php.net/rfc/callable
-                    if (!empty($node->type) && $type === 'callable') {
-                        return LanguageLevel::PHP5_4;
                     }
 
                     return null;
