@@ -371,7 +371,7 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
 
         self::addMapping($mapping, Node\Stmt\TraitUse::class)
             ->with('traits', Node\Name::class, true)
-            ->with('adaptations', Node\Stmt\TraitUseAdaptation::class, true);
+            ->with('adaptations', Node\Stmt::class, true);
 
         self::addMapping($mapping, Node\Stmt\TraitUseAdaptation::class)
             ->with('trait', Node\Name::class, nullable: true)
