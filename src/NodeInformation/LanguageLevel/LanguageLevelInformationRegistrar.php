@@ -98,7 +98,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 public function inspect(/** @var Node\Expr\ClassConstFetch $node */ Node $node): ?LanguageLevel
                 {
                     // https://www.php.net/manual/en/language.oop5.changelog.php
-                    if ((string)$node->name->name === 'class') {
+                    if ($node->name instanceof Node\Identifier && $node->name->name === 'class') {
                         return LanguageLevel::PHP5_5;
                     }
 
@@ -141,7 +141,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\ConstFetch $node */ Node $node): ?LanguageLevel
                 {
-                    return match ((string)$node->name) {
+                    return match ($node->name->toString()) {
                         // https://wiki.php.net/rfc/e-user-deprecated-warning
                         'E_USER_DEPRECATED' => LanguageLevel::PHP5_3,
                         default => null
@@ -174,7 +174,10 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 public function inspect(/** @var Node\Expr\FuncCall $node */ Node $node): ?LanguageLevel
                 {
                     // https://wiki.php.net/rfc/context_sensitive_lexer
-                    if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                    if (
+                        $node->name instanceof Node\Expr\Variable &&
+                        is_string($node->name->name) &&
+                        Quirks::isSemiReservedKeyword($node->name->name)) {
                         return LanguageLevel::PHP7_0;
                     }
 
@@ -231,12 +234,12 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                     /** @var Node\Expr\ArrayItem $item */
                     foreach ($node->items as $item) {
                         // https://wiki.php.net/rfc/list_reference_assignment
-                        if ($item->byRef) {
+                        if ($item?->byRef) {
                             return LanguageLevel::PHP7_2;
                         }
 
                         // https://wiki.php.net/rfc/list_keys
-                        if (!empty($item->key)) {
+                        if (!empty($item?->key)) {
                             return LanguageLevel::PHP7_1;
                         }
                     }
@@ -251,7 +254,10 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
             from: new class implements LanguageLevelInspector {
                 public function inspect(/** @var Node\Expr\MethodCall $node */ Node $node): ?LanguageLevel
                 {
-                    if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                    if (
+                        $node->name instanceof Node\Expr\Variable &&
+                        is_string($node->name->name) &&
+                        Quirks::isSemiReservedKeyword($node->name->name)) {
                         return LanguageLevel::PHP7_0;
                     }
 
@@ -302,7 +308,10 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 public function inspect(/** @var Node\Expr\PropertyFetch $node */ Node $node): ?LanguageLevel
                 {
                     // https://wiki.php.net/rfc/context_sensitive_lexer
-                    if (Quirks::isSemiReservedKeyword((string)$node->name)) {
+                    if (
+                        $node->name instanceof Node\Expr\Variable &&
+                        is_string($node->name->name) &&
+                        Quirks::isSemiReservedKeyword($node->name->name)) {
                         return LanguageLevel::PHP7_0;
                     }
 
@@ -387,7 +396,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 // literals.
                 // https://www.php.net/manual/en/language.types.integer.php
                 // Also applies to floats: https://www.php.net/manual/en/language.types.float.php
-                if (str_contains($rawValue, '_')) {
+                if (!is_null($rawValue) && str_contains($rawValue, '_')) {
                     return LanguageLevel::PHP7_4;
                 }
 
@@ -541,7 +550,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 public function inspect(/** @var Node\Stmt\ClassMethod $node */ Node $node): ?LanguageLevel
                 {
                     // https://www.php.net/manual/en/language.oop5.changelog.php
-                    return match ((string)$node->name->name) {
+                    return match ($node->name->name) {
                         '__autoload' => LanguageLevel::PHP7_1,
                         default => null
                     };
@@ -571,7 +580,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     // https://wiki.php.net/rfc/new_in_initializers
                     foreach ($node->consts as $const) {
-                        if ($const->value instanceof Node\Expr\New_) {
+                        if ($const?->value instanceof Node\Expr\New_) {
                             return LanguageLevel::PHP8_1;
                         }
                     }
@@ -765,7 +774,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 {
                     foreach ($node->args as $arg) {
                         // https://wiki.php.net/rfc/new_in_initializers
-                        if ($arg->value instanceof Node\Expr\New_) {
+                        if ($arg?->value instanceof Node\Expr\New_) {
                             return LanguageLevel::PHP8_1;
                         }
                     }
