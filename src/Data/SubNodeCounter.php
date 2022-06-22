@@ -144,6 +144,8 @@ final class SubNodeCounter
                 );
             } elseif ($this->definition->accepts($subNodeClass = get_class($subNode))) {
                 $class = $subNodeClass;
+            } elseif ($subNodeClass === Node\Expr\Error::class) {
+                return;
             } else {
                 throw new DomainException(
                     sprintf(

@@ -87,6 +87,8 @@ class SubNodeInformationRegistrar implements NodeInformationRegistrar
         self::addMapping($mapping, Node\Expr\Empty_::class)
             ->withExpr();
 
+        self::addMapping($mapping, Node\Expr\Error::class);
+
         self::addMapping($mapping, Node\Expr\ErrorSuppress::class)
             ->withExpr();
 

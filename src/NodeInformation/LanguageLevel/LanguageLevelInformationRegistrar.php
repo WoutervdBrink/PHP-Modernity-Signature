@@ -164,6 +164,7 @@ final class LanguageLevelInformationRegistrar implements NodeInformationRegistra
                 }
             }
         );
+        LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Error::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\ErrorSuppress::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Eval_::class);
         LanguageLevelInformationRegistrar::addMapping($mapping, Node\Expr\Exit_::class);
