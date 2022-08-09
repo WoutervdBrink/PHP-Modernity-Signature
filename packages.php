@@ -27,10 +27,10 @@ fputcsv($fp, $line);
 set_error_handler(function ($errno, $errstr, $errfile, $errline) {
     echo $errno.': '.$errstr.PHP_EOL;
     echo $errfile.':'.$errline.PHP_EOL;
-    exit(1);
+//    exit(1);
 }, E_ALL);
 
-foreach (new DirectoryIterator(__DIR__ . '/resources/packages/') as $package) {
+foreach (new DirectoryIterator(__DIR__ . '/resources/packages/test/') as $package) {
     if (!$package->isDir() || $package->isDot()) {
         continue;
     }

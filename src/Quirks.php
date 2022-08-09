@@ -109,6 +109,6 @@ final class Quirks
 
     public static function getParameterVariableNames(array $params): array
     {
-        return array_map(fn(Param $param): string => (string)$param->var->name, $params);
+        return array_map(fn(Param $param): string => ((string)$param?->var?->name) ?? '', $params);
     }
 }

@@ -1,0 +1,11 @@
+\begin{tikzpicture}
+\begin{axis}[
+    xtick = {{{ levels }}},
+    ytick = {{{ versions }}},
+    ztick = {0, 1}]
+\addplot3 coordinates [
+    surf] {
+{{ coordinates }}
+};
+\end{axis}
+\end{tikzpicture}
